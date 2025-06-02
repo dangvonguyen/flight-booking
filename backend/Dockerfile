@@ -18,6 +18,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY . .
 
+# Cài đặt alembic
+RUN pip install alembic
+
+# Cấp quyền thực thi cho prestart.sh
+RUN chmod +x scripts/prestart.sh
+
 FROM base AS runtime
 
 COPY --from=builder --chown=app:app /app /app

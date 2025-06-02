@@ -1,99 +1,210 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply m-0 p-0 box-border;
+  }
+
+  body {
+    @apply font-sans bg-gray-100 min-h-screen;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-gray-900;
+  }
+
+  input, select, textarea {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
 }
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f2f5;
-}
+@layer components {
+  .btn {
+    @apply font-semibold rounded-lg px-4 py-2 transition-colors duration-200;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-500 text-white hover:bg-gray-600;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white;
+  }
+  
+  .btn-small {
+    @apply text-sm px-3 py-1;
+  }
+  
+  .btn-large {
+    @apply text-lg px-6 py-3;
+  }
+  
+  .loading-spinner {
+    @apply inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em];
+  }
 
-.auth-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
-}
+  .auth-container {
+    @apply flex flex-col items-center justify-center min-h-screen p-5;
+  }
 
-.auth-form {
-  background: white;
-  padding: 30px;
-  border-radius: 10 px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 400px;
-}
+  .auth-form {
+    @apply bg-white p-8 rounded-lg shadow-md w-full max-w-md;
+  }
 
-.auth-form h2 {
-  text-align: center;
-  margin-bottom: 24px;
-  color: #1a73e8;
-}
+  .auth-form h2 {
+    @apply text-center mb-6 text-blue-600;
+  }
 
-.error-message {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  border: 1px solid rgb(224, 67, 67);
-  font-size: 16px;
-  margin-bottom: 16px;
-  background-color: rgb(248, 209, 209);
-  text-align: center;
-}
+  .error-message {
+    @apply w-full p-3 rounded border border-red-400 text-base mb-4 bg-red-100 text-center;
+  }
 
-.form-group {
-  margin-bottom: 16px;
-}
+  .form-group {
+    @apply mb-4;
+  }
 
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #333;
-}
+  .form-group label {
+    @apply block mb-2 text-gray-700;
+  }
 
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
+  .form-group input {
+    @apply w-full p-3 border border-gray-300 rounded text-base focus:outline-none focus:border-blue-600;
+  }
 
-.form-group input:focus {
-  outline: none;
-  border-color: #1a73e8;
-}
+  .submit-button {
+    @apply w-full py-3 bg-blue-600 text-white border-none rounded text-base cursor-pointer mt-4 hover:bg-blue-700;
+  }
 
-.submit-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #1a73e8;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 16px;
-}
+  .auth-link {
+    @apply text-center mt-4;
+  }
 
-.submit-button:hover {
-  background-color: #1557b0;
-}
+  .auth-link a {
+    @apply text-blue-600 no-underline hover:underline;
+  }
 
-.auth-link {
-  text-align: center;
-  margin-top: 16px;
-}
+  /* Thêm styles cho layout */
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
 
-.auth-link a {
-  color: #1a73e8;
-  text-decoration: none;
-}
+  .card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden;
+  }
 
-.auth-link a:hover {
-  text-decoration: underline;
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-200;
+  }
+
+  .card-body {
+    @apply p-6;
+  }
+
+  .card-footer {
+    @apply px-6 py-4 bg-gray-50 border-t border-gray-200;
+  }
+
+  /* Styles cho form */
+  .form-input {
+    @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700;
+  }
+
+  .form-error {
+    @apply mt-1 text-sm text-red-600;
+  }
+
+  /* Styles cho table */
+  .table {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+
+  .table-header {
+    @apply bg-gray-50;
+  }
+
+  .table-header th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+  }
+
+  .table-body {
+    @apply bg-white divide-y divide-gray-200;
+  }
+
+  .table-row {
+    @apply hover:bg-gray-50;
+  }
+
+  .table-cell {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500;
+  }
+
+  /* Styles cho navigation */
+  .nav-link {
+    @apply text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium;
+  }
+
+  .nav-link-active {
+    @apply bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium;
+  }
+
+  /* Styles cho alerts */
+  .alert {
+    @apply p-4 rounded-md mb-4;
+  }
+
+  .alert-success {
+    @apply bg-green-100 text-green-700 border border-green-400;
+  }
+
+  .alert-error {
+    @apply bg-red-100 text-red-700 border border-red-400;
+  }
+
+  .alert-warning {
+    @apply bg-yellow-100 text-yellow-700 border border-yellow-400;
+  }
+
+  .alert-info {
+    @apply bg-blue-100 text-blue-700 border border-blue-400;
+  }
+
+  /* Styles cho loading states */
+  .loading-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+  }
+
+  .loading-content {
+    @apply bg-white p-4 rounded-lg shadow-lg;
+  }
+
+  /* Styles cho modal */
+  .modal {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+  }
+
+  .modal-content {
+    @apply bg-white rounded-lg shadow-xl max-w-lg w-full mx-4;
+  }
+
+  .modal-header {
+    @apply px-6 py-4 border-b border-gray-200;
+  }
+
+  .modal-body {
+    @apply px-6 py-4;
+  }
+
+  .modal-footer {
+    @apply px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3;
+  }
 } 

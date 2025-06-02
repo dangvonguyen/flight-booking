@@ -1,6 +1,8 @@
+version: '3.8'
+
 services:
   db:
-    image: postgres:17
+    image: postgres:14-alpine
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -9,15 +11,17 @@ services:
       retries: 3
       start_period: 45s
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:?Variable not set}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Variable not set}
-      - POSTGRES_DB=${POSTGRES_DB:?Variable not set}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=flight_booking
     ports:
       - "5432:5432"
+    networks:
+      - app-network
 
   prestart:
     image: "${DOCKER_IMAGE_BACKEND}:${TAG:-latest}"
@@ -47,6 +51,7 @@ services:
     restart: always
     build:
       context: ./backend
+      dockerfile: Dockerfile
     depends_on:
       db:
         condition: service_healthy
@@ -65,8 +70,16 @@ services:
       - POSTGRES_DB=${POSTGRES_DB:?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER:?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Variable not set}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/flight_booking
+      - JWT_SECRET=your_jwt_secret
+      - VNPAY_TMN_CODE=your_vnpay_tmn_code
+      - VNPAY_HASH_SECRET=your_vnpay_hash_secret
+      - VNPAY_RETURN_URL=http://localhost:3000/payment/callback
+      - NODE_ENV=development
     ports:
       - "8000:8000"
+    networks:
+      - app-network
 
   frontend:
     image: "${DOCKER_IMAGE_FRONTEND}:${TAG:-latest}"
@@ -74,12 +87,19 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=http://localhost:8000
+    ports:
+      - "3000:80"
     depends_on:
       - backend
-    ports:
-      - "5173:80"
+    networks:
+      - app-network
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+      - REACT_APP_VNPAY_RETURN_URL=http://localhost:3000/payment/callback
 
 volumes:
-  db_data:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
