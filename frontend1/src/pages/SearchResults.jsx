@@ -8,35 +8,18 @@ export default function SearchResults() {
   const navigate = useNavigate()
   const searchParams = location.state?.searchParams
 
-  if (!searchParams) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-900">
-            Không tìm thấy thông tin tìm kiếm
-          </h2>
-          <p className="mt-2 text-gray-600">
-            Vui lòng quay lại trang tìm kiếm
-          </p>
-          <Button
-            onClick={() => navigate('/search')}
-            className="mt-4"
-          >
-            Quay lại tìm kiếm
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   // Lọc chuyến bay theo thông tin tìm kiếm
-  const filteredFlights = mockFlights.filter((flight) => {
-    return (
-      flight.from.code === searchParams.from &&
-      flight.to.code === searchParams.to &&
-      flight.from.date === searchParams.date
-    )
-  })
+  const filteredFlights = searchParams
+    ? mockFlights.filter((flight) => {
+        return (
+          flight.from.code === searchParams.from &&
+          flight.to.code === searchParams.to &&
+          flight.from.date === searchParams.departureDate
+        )
+      })
+    : []
+
+  const showAll = filteredFlights.length === 0
 
   const handleSelectFlight = (flight) => {
     navigate('/book', {
@@ -55,33 +38,37 @@ export default function SearchResults() {
             <h1 className="text-2xl font-semibold text-gray-900">
               Kết quả tìm kiếm
             </h1>
-            <p className="mt-2 text-gray-600">
-              {searchParams.from} → {searchParams.to} | {searchParams.date}
-            </p>
+            {searchParams && (
+              <p className="mt-2 text-gray-600">
+                {searchParams.from} → {searchParams.to} | {searchParams.departureDate}
+              </p>
+            )}
+            {showAll && (
+              <p className="mt-2 text-red-500 font-medium">
+                Không tìm thấy chuyến bay phù hợp, hiển thị tất cả chuyến bay hiện có:
+              </p>
+            )}
           </div>
 
-          {filteredFlights.length === 0 ? (
+          {(showAll ? mockFlights : filteredFlights).length === 0 ? (
             <Card>
               <Card.Body>
                 <div className="text-center py-8">
                   <h3 className="text-lg font-medium text-gray-900">
-                    Không tìm thấy chuyến bay phù hợp
+                    Không có chuyến bay nào trong hệ thống
                   </h3>
-                  <p className="mt-2 text-gray-600">
-                    Vui lòng thử lại với thông tin khác
-                  </p>
                   <Button
-                    onClick={() => navigate('/search')}
+                    onClick={() => navigate('/')}
                     className="mt-4"
                   >
-                    Tìm kiếm lại
+                    Quay lại trang chủ
                   </Button>
                 </div>
               </Card.Body>
             </Card>
           ) : (
             <div className="space-y-4">
-              {filteredFlights.map((flight) => (
+              {(showAll ? mockFlights : filteredFlights).map((flight) => (
                 <Card key={flight.id}>
                   <Card.Body>
                     <div className="flex items-center justify-between">

@@ -4,17 +4,16 @@ import { useLocation, useNavigate } from 'react-router-dom'
 export default function PaymentProcess() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { flight, seatClass, passengerInfo, paymentMethod, cardInfo } = location.state || {}
+  const { flight, seatClass, passengerInfo, paymentMethod, cardInfo, selectedSeat, searchParams } = location.state || {}
 
   const [status, setStatus] = useState('processing')
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     if (!flight || !passengerInfo) {
-      navigate('/search')
+      navigate('/')
       return
     }
-
     // Simulate payment processing
     const timer = setInterval(() => {
       setProgress(prev => {
@@ -26,7 +25,6 @@ export default function PaymentProcess() {
         return prev + 10
       })
     }, 500)
-
     return () => clearInterval(timer)
   }, [flight, passengerInfo, navigate])
 
@@ -89,20 +87,31 @@ export default function PaymentProcess() {
                   <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">Hành trình</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {flight.departure.city} → {flight.arrival.city}
+                      {flight.from.city} → {flight.to.city}
                     </dd>
                   </div>
                   <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">Thời gian</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {flight.departure.time} - {flight.arrival.time}
+                      {flight.from.time} - {flight.to.time} ({flight.from.date})
                     </dd>
                   </div>
                   <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">Hạng vé</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {seatClass === 'economy' ? 'Phổ thông' :
-                       seatClass === 'business' ? 'Thương gia' : 'Hạng nhất'}
+                      {seatClass === 'economy' ? 'Phổ thông' : seatClass === 'business' ? 'Thương gia' : 'Hạng nhất'}
+                    </dd>
+                  </div>
+                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">Ghế</dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {selectedSeat?.number}
+                    </dd>
+                  </div>
+                  <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">Phương thức thanh toán</dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {paymentMethod === 'credit-card' ? 'Thẻ tín dụng/ghi nợ' : paymentMethod === 'momo' ? 'Ví MoMo' : paymentMethod === 'zalopay' ? 'ZaloPay' : 'Chuyển khoản ngân hàng'}
                     </dd>
                   </div>
                 </dl>

@@ -29,6 +29,7 @@ export default function Book() {
 
   // Lấy thông tin chuyến bay từ location state hoặc sử dụng mock data
   const flightDetails = location.state?.flight || mockFlights[0]
+  const searchParams = location.state?.searchParams || {}
 
   const handlePassengerSubmit = (e) => {
     e.preventDefault()
@@ -45,6 +46,7 @@ export default function Book() {
         flightDetails,
         passengerInfo,
         selectedSeat,
+        searchParams,
       },
     })
   }

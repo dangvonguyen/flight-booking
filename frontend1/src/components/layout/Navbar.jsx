@@ -27,17 +27,9 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/search" className="text-gray-600 hover:text-gray-900">
-              Tìm chuyến bay
-            </Link>
             {user && (
               <Link to="/bookings" className="text-gray-600 hover:text-gray-900">
                 Lịch sử đặt vé
-              </Link>
-            )}
-            {role === 'admin' && (
-              <Link to="/admin" className="text-gray-600 hover:text-gray-900">
-                Quản lý
               </Link>
             )}
             <Link to="/about" className="text-gray-600 hover:text-gray-900">

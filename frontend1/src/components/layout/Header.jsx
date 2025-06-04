@@ -8,13 +8,24 @@ export default function Header() {
   const location = useLocation()
   const { user, logout, isAuthenticated } = useAuth()
 
-  const navigation = [
-    { name: 'Trang chủ', href: '/' },
-    { name: 'Tìm chuyến bay', href: '/search' },
-    { name: 'Đặt chỗ của tôi', href: '/bookings' },
-    { name: 'Giới thiệu', href: '/about' },
-    { name: 'Liên hệ', href: '/contact' },
+  const isAdmin = user?.role === 'admin'
+
+  const adminNavigation = [
+    { name: 'Tổng quan', href: '/admin' },
+    { name: 'Quản lý người dùng', href: '/admin/users' },
+    { name: 'Quản lý khiếu nại, góp ý', href: '/admin/feedback' },
+    { name: 'Tra cứu vé', href: '/admin/tickets' },
   ]
+
+  const navigation = isAdmin
+    ? adminNavigation
+    : [
+        { name: 'Trang chủ', href: '/' },
+        { name: 'Tìm chuyến bay', href: '/search' },
+        { name: 'Đặt chỗ của tôi', href: '/bookings' },
+        { name: 'Giới thiệu', href: '/about' },
+        { name: 'Liên hệ', href: '/contact' },
+      ]
 
   return (
     <header className="bg-white shadow-sm">

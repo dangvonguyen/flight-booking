@@ -8,7 +8,7 @@ import { mockPaymentMethods } from '../mocks/flightData'
 export default function Payment() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { flightDetails, passengerInfo, selectedSeat } = location.state || {}
+  const { flightDetails, passengerInfo, selectedSeat, searchParams } = location.state || {}
 
   const [selectedMethod, setSelectedMethod] = useState('credit-card')
   const [cardInfo, setCardInfo] = useState({
@@ -70,13 +70,15 @@ export default function Payment() {
     e.preventDefault()
     if (validateCardInfo()) {
       // Xử lý thanh toán ở đây
-      navigate('/payment/success', {
+      navigate('/payment-process', {
         state: {
-          flightDetails,
+          flight: flightDetails,
+          seatClass: flightDetails.seatClass,
           passengerInfo,
-          selectedSeat,
           paymentMethod: selectedMethod,
           cardInfo: selectedMethod === 'credit-card' ? cardInfo : null,
+          selectedSeat,
+          searchParams,
         },
       })
     }

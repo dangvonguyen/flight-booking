@@ -21,13 +21,14 @@ export default function Login() {
     setIsLoading(true)
 
     try {
-      if (login(formData.email, formData.password)) {
-        navigate('/')
+      const userData = await login(formData.email, formData.password)
+      if (userData.role === 'admin') {
+        navigate('/admin')
       } else {
-        setError('Email hoặc mật khẩu không đúng')
+        navigate('/')
       }
     } catch (err) {
-      setError('Có lỗi xảy ra, vui lòng thử lại')
+      setError('Đăng nhập thất bại!')
     } finally {
       setIsLoading(false)
     }

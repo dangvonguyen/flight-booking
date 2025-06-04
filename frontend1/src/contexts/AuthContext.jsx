@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem('user', JSON.stringify(foundUser))
       setUser(foundUser)
       setRole(foundUser.role)
-      return true
+      return foundUser // Trả về object user thay vì true
     }
     return false
   }
