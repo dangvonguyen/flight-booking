@@ -413,18 +413,7 @@ export default function TicketPrint({ booking, onClose }) {
                   </div>
                 </div>
 
-                {/* QR Code */}
-                <div className="text-center mb-6">
-                  <div className="inline-block p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
-                    <div className="w-32 h-32 bg-white border border-gray-200 flex items-center justify-center rounded mb-2">
-                      <div className="text-xs text-gray-500 text-center">
-                        <div className="mb-1">📱</div>
-                        <div>QR CODE</div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 font-medium">Quét mã để check-in</p>
-                  </div>
-                </div>
+
 
                 {/* Footer */}
                 <div className="text-center text-sm text-gray-600 border-t-2 border-gray-200 pt-6">

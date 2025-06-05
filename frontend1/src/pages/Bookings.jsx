@@ -171,53 +171,99 @@ export default function Bookings() {
           </div>
 
           {/* Search */}
-          <Card className="mb-6">
-            <Card.Body>
-              <form onSubmit={handleSearch} className="flex gap-4">
-                <div className="flex-1">
-                  <Input
-                    label="Tìm kiếm theo mã đặt vé"
-                    value={searchCode}
-                    onChange={(e) => setSearchCode(e.target.value)}
-                    placeholder="Nhập mã đặt vé..."
-                  />
+          <div className="bg-gradient-to-r from-blue-500 to-sky-500 rounded-2xl p-8 mb-8 shadow-lg">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">
+                🔍 Tra cứu đặt vé
+              </h2>
+              <p className="text-blue-100">
+                Nhập mã đặt vé để tìm kiếm thông tin chuyến bay của bạn
+              </p>
+            </div>
+            
+            <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1">
+                    <label className="block text-white font-medium mb-2">
+                      Mã đặt vé
+                    </label>
+                    <input
+                      type="text"
+                      value={searchCode}
+                      onChange={(e) => setSearchCode(e.target.value)}
+                      placeholder="Ví dụ: BK123456789"
+                      className="w-full px-4 py-3 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 font-mono text-gray-900 placeholder-gray-500"
+                    />
+                  </div>
+                  <div className="flex gap-3 md:items-end">
+                    <Button 
+                      type="submit"
+                      className="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-semibold transition-colors shadow-md"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      Tìm kiếm
+                    </Button>
+                    <Button 
+                      type="button"
+                      onClick={handleClearSearch}
+                      className="bg-white/20 text-white hover:bg-white/30 px-6 py-3 rounded-lg font-semibold transition-colors border border-white/30"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Xóa
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-2 items-end">
-                  <Button type="submit">
-                    Tìm kiếm
-                  </Button>
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    onClick={handleClearSearch}
-                  >
-                    Xóa
-                  </Button>
+                
+                {/* Quick tips */}
+                <div className="mt-4 p-4 bg-white/10 rounded-lg border border-white/20">
+                  <p className="text-white/90 text-sm">
+                    💡 <strong>Mẹo:</strong> Mã đặt vé gồm 11 ký tự, bắt đầu bằng "BK" theo sau là 9 số
+                  </p>
                 </div>
-              </form>
-            </Card.Body>
-          </Card>
+              </div>
+            </form>
+          </div>
           
           {/* Filter */}
-          <div className="flex gap-4 mb-6">
-            <Button
-              variant={filter === 'all' ? 'primary' : 'outline'}
-              onClick={() => setFilter('all')}
-            >
-              Tất cả ({mockBookings.length})
-            </Button>
-            <Button
-              variant={filter === 'upcoming' ? 'primary' : 'outline'}
-              onClick={() => setFilter('upcoming')}
-            >
-              Sắp tới ({upcomingCount})
-            </Button>
-            <Button
-              variant={filter === 'past' ? 'primary' : 'outline'}
-              onClick={() => setFilter('past')}
-            >
-              Đã bay ({pastCount})
-            </Button>
+          <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Lọc theo trạng thái</h3>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                  filter === 'all'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                📋 Tất cả ({mockBookings.length})
+              </button>
+              <button
+                onClick={() => setFilter('upcoming')}
+                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                  filter === 'upcoming'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                ✈️ Sắp tới ({upcomingCount})
+              </button>
+              <button
+                onClick={() => setFilter('past')}
+                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                  filter === 'past'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                ✅ Đã bay ({pastCount})
+              </button>
+            </div>
           </div>
 
           {/* Booking list */}

@@ -3,120 +3,28 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
-
-// Mock data for testing
-const mockData = {
-  flightDetails: {
-    id: 'FL001',
-    flightNumber: 'VN123',
-    airline: 'Vietnam Airlines',
-    from: {
-      code: 'SGN',
-      city: 'TP. Hồ Chí Minh',
-      time: '08:30',
-      date: '2024-01-15'
-    },
-    to: {
-      code: 'HAN',
-      city: 'Hà Nội',
-      time: '10:45',
-      date: '2024-01-15'
-    },
-    duration: '2h 15m',
-    price: 2500000,
-    seatClass: 'economy',
-    aircraft: 'Airbus A321'
-  },
-  passengerInfo: {
-    firstName: 'Văn A',
-    lastName: 'Nguyễn',
-    email: 'nguyenvana@email.com',
-    phone: '0901234567',
-    dateOfBirth: '1990-01-01',
-    nationality: 'Việt Nam',
-    passportNumber: 'AB1234567'
-  },
-  selectedSeat: {
-    number: '12A',
-    type: 'window',
-    price: 100000
-  },
-  searchParams: {
-    from: 'SGN',
-    to: 'HAN',
-    departDate: '2024-01-15',
-    passengers: 1,
-    seatClass: 'economy'
-  },
-  departureAirport: {
-    airport_name: 'Sân bay Tân Sơn Nhất',
-    city: 'TP. Hồ Chí Minh'
-  },
-  arrivalAirport: {
-    airport_name: 'Sân bay Nội Bài',
-    city: 'Hà Nội'
-  }
-}
-
-// Payment methods data
-const paymentMethods = [
-  {
-    id: 'vnpay',
-    name: 'VNPay',
-    icon: '💳',
-    description: 'Thanh toán qua VNPay QR Code',
-    fee: 0
-  },
-  {
-    id: 'credit-card',
-    name: 'Thẻ tín dụng/ghi nợ',
-    icon: '💳',
-    description: 'Thanh toán bằng thẻ Visa, Mastercard, JCB',
-    fee: 25000
-  },
-  {
-    id: 'momo',
-    name: 'Ví MoMo',
-    icon: '📱',
-    description: 'Thanh toán qua ứng dụng MoMo',
-    fee: 0
-  },
-  {
-    id: 'zalopay',
-    name: 'ZaloPay',
-    icon: '💸',
-    description: 'Thanh toán qua ứng dụng ZaloPay',
-    fee: 0
-  },
-  {
-    id: 'bank-transfer',
-    name: 'Chuyển khoản ngân hàng',
-    icon: '🏦',
-    description: 'Chuyển khoản trực tiếp đến tài khoản ngân hàng',
-    fee: 0
-  },
-  {
-    id: 'paypal',
-    name: 'PayPal',
-    icon: '🌐',
-    description: 'Thanh toán qua tài khoản PayPal',
-    fee: 50000
-  }
-]
+import { mockBookingData, paymentMethods } from '../data/mockPaymentData'
 
 export default function Payment() {
   const location = useLocation()
   const navigate = useNavigate()
   
-  // Use mock data if no real data is available
+  // Use mock data if no real data is available - ALWAYS use mock data for testing
   const { 
-    flightDetails = mockData.flightDetails, 
-    passengerInfo = mockData.passengerInfo, 
-    selectedSeat = mockData.selectedSeat, 
-    searchParams = mockData.searchParams,
-    departureAirport = mockData.departureAirport,
-    arrivalAirport = mockData.arrivalAirport 
-  } = location.state || {}
+    flightDetails = mockBookingData.flightDetails, 
+    passengerInfo = mockBookingData.passengerInfo, 
+    selectedSeat = mockBookingData.selectedSeat, 
+    searchParams = mockBookingData.searchParams,
+    departureAirport = mockBookingData.departureAirport,
+    arrivalAirport = mockBookingData.arrivalAirport 
+  } = location.state || mockBookingData
+
+  // Debug logging để kiểm tra
+  console.log('Payment component loaded with data:', {
+    flightDetails,
+    passengerInfo,
+    selectedSeat
+  })
 
   const [selectedMethod, setSelectedMethod] = useState('vnpay')
   const [cardInfo, setCardInfo] = useState({
@@ -126,6 +34,7 @@ export default function Payment() {
     cvv: '',
   })
   const [errors, setErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Removed validation since we're using mock data for testing
 
@@ -161,9 +70,14 @@ export default function Payment() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (validateCardInfo()) {
+      setIsSubmitting(true)
+      
+      // Add loading delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
       // Tạo booking ID
       const bookingId = `BK${Date.now().toString().slice(-8)}`
       
@@ -205,7 +119,7 @@ export default function Payment() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-8 animate-fadeIn">
             Thanh toán
           </h1>
 
@@ -214,7 +128,7 @@ export default function Payment() {
               {/* Thông tin đơn hàng */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Thông tin chuyến bay */}
-                <Card>
+                <Card className="animate-slideUp">
                   <Card.Header>
                     <h2 className="text-lg font-medium">Thông tin chuyến bay</h2>
                   </Card.Header>
@@ -258,7 +172,7 @@ export default function Payment() {
                 </Card>
 
                 {/* Thông tin hành khách */}
-                <Card>
+                <Card className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
                   <Card.Header>
                     <h2 className="text-lg font-medium">Thông tin hành khách</h2>
                   </Card.Header>
@@ -289,7 +203,7 @@ export default function Payment() {
                 </Card>
 
                 {/* Phương thức thanh toán */}
-                <Card>
+                <Card className="animate-slideUp" style={{ animationDelay: '0.2s' }}>
                   <Card.Header>
                     <h2 className="text-lg font-medium">
                       Phương thức thanh toán
@@ -297,15 +211,16 @@ export default function Payment() {
                   </Card.Header>
                   <Card.Body>
                     <div className="space-y-4">
-                      {paymentMethods.map((method) => (
+                      {paymentMethods.map((method, index) => (
                         <div
                           key={method.id}
-                          className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                          className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-300 hover:shadow-md ${
                             selectedMethod === method.id
-                              ? 'border-primary-500 bg-primary-50'
+                              ? 'border-primary-500 bg-primary-50 shadow-sm'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                           onClick={() => setSelectedMethod(method.id)}
+                          style={{ animationDelay: `${0.3 + index * 0.05}s` }}
                         >
                           <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center text-2xl">
                             {method.icon}
@@ -325,14 +240,14 @@ export default function Payment() {
                           </div>
                           <div className="ml-auto">
                             <div
-                              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                                 selectedMethod === method.id
-                                  ? 'border-primary-500 bg-primary-500'
+                                  ? 'border-primary-500 bg-primary-500 scale-110'
                                   : 'border-gray-300'
                               }`}
                             >
                               {selectedMethod === method.id && (
-                                <div className="w-2 h-2 rounded-full bg-white" />
+                                <div className="w-2 h-2 rounded-full bg-white animate-scaleIn" />
                               )}
                             </div>
                           </div>
@@ -342,7 +257,7 @@ export default function Payment() {
 
                     {/* Thông tin thẻ tín dụng */}
                     {selectedMethod === 'credit-card' && (
-                      <div className="mt-6 pt-6 border-t">
+                      <div className="mt-6 pt-6 border-t animate-fadeIn">
                         <h3 className="text-md font-medium mb-4">
                           Thông tin thẻ tín dụng
                         </h3>
@@ -403,7 +318,7 @@ export default function Payment() {
 
               {/* Tóm tắt giá */}
               <div className="lg:col-span-1">
-                <Card className="sticky top-8">
+                <Card className="sticky top-8 animate-slideUp" style={{ animationDelay: '0.3s' }}>
                   <Card.Header>
                     <h2 className="text-lg font-medium">Tóm tắt đơn hàng</h2>
                   </Card.Header>
@@ -434,7 +349,7 @@ export default function Payment() {
                       <div className="border-t pt-4">
                         <div className="flex justify-between text-lg font-semibold">
                           <span>Tổng cộng</span>
-                          <span className="text-primary-600">
+                          <span className="text-primary-600 animate-heartbeat">
                             {totalPrice.toLocaleString('vi-VN')}đ
                           </span>
                         </div>
@@ -442,8 +357,23 @@ export default function Payment() {
                     </div>
                   </Card.Body>
                   <Card.Footer>
-                    <Button type="submit" className="w-full">
-                      Tiến hành thanh toán
+                    <Button 
+                      type="submit" 
+                      className={`w-full transition-all duration-300 ${
+                        isSubmitting 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : 'hover:scale-105 hover:shadow-lg'
+                      }`}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                          Đang xử lý...
+                        </div>
+                      ) : (
+                        'Tiến hành thanh toán'
+                      )}
                     </Button>
                   </Card.Footer>
                 </Card>

@@ -3,75 +3,25 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import TicketPrint from '../components/booking/TicketPrint'
-
-// Mock data for testing
-const mockSuccessData = {
-  bookingId: 'BK12345678',
-  flight: {
-    id: 'FL001',
-    flightNumber: 'VN123',
-    airline: 'Vietnam Airlines',
-    from: {
-      code: 'SGN',
-      city: 'TP. Hồ Chí Minh',
-      time: '08:30',
-      date: '2024-01-15'
-    },
-    to: {
-      code: 'HAN',
-      city: 'Hà Nội',
-      time: '10:45',
-      date: '2024-01-15'
-    },
-    duration: '2h 15m',
-    price: 2500000,
-    seatClass: 'economy',
-    departureTime: new Date('2024-01-15T08:30:00').toISOString()
-  },
-  passengerInfo: {
-    firstName: 'Văn A',
-    lastName: 'Nguyễn',
-    email: 'nguyenvana@email.com',
-    phone: '0901234567',
-    dateOfBirth: '1990-01-01',
-    nationality: 'Việt Nam',
-    passportNumber: 'AB1234567'
-  },
-  selectedSeat: {
-    number: '12A',
-    type: 'window',
-    price: 100000
-  },
-  paymentMethod: 'vnpay',
-  departureAirport: {
-    airport_name: 'Sân bay Tân Sơn Nhất',
-    city: 'TP. Hồ Chí Minh'
-  },
-  arrivalAirport: {
-    airport_name: 'Sân bay Nội Bài',
-    city: 'Hà Nội'
-  },
-  totalAmount: 2600000,
-  bookingDate: new Date().toISOString()
-}
+import { mockBookingData } from '../data/mockPaymentData'
 
 export default function PaymentSuccess() {
   const location = useLocation()
   const navigate = useNavigate()
   const [showPrintSection, setShowPrintSection] = useState(false)
   
-  // Use mock data if no real data is available
+  // Use mock data if no real data is available - ALWAYS use mock data for testing
   const {
-    bookingId = mockSuccessData.bookingId,
-    flight = mockSuccessData.flight,
-    passengerInfo = mockSuccessData.passengerInfo,
-    selectedSeat = mockSuccessData.selectedSeat,
-    paymentMethod = mockSuccessData.paymentMethod,
-    departureAirport = mockSuccessData.departureAirport,
-    arrivalAirport = mockSuccessData.arrivalAirport,
-    totalAmount = mockSuccessData.totalAmount,
-    bookingDate = mockSuccessData.bookingDate
-  } = location.state || {}
+    bookingId = mockBookingData.bookingId,
+    flight = mockBookingData.flightDetails,
+    passengerInfo = mockBookingData.passengerInfo,
+    selectedSeat = mockBookingData.selectedSeat,
+    paymentMethod = mockBookingData.paymentMethod,
+    departureAirport = mockBookingData.departureAirport,
+    arrivalAirport = mockBookingData.arrivalAirport,
+    totalAmount = mockBookingData.totalAmount,
+    bookingDate = mockBookingData.bookingDate
+  } = location.state || mockBookingData
 
   const getPaymentMethodName = (method) => {
     const methods = {
@@ -116,22 +66,22 @@ export default function PaymentSuccess() {
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto">
           {/* Success Header */}
-          <div className="text-center mb-8">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="text-center mb-8 animate-fadeIn">
+            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
               <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            <h1 className="text-4xl font-bold text-gray-900 mb-3 animate-slideUp">
               🎉 Đặt vé thành công!
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 animate-slideUp" style={{ animationDelay: '0.2s' }}>
               Chúc mừng! Vé máy bay của bạn đã được xác nhận
             </p>
           </div>
 
           {/* Booking Info Card */}
-          <Card className="mb-8">
+          <Card className="mb-8 animate-slideUp" style={{ animationDelay: '0.4s' }}>
             <Card.Body className="p-8">
               {/* Booking Code - Most Important */}
               <div className="text-center mb-8">
@@ -291,7 +241,7 @@ export default function PaymentSuccess() {
 
           {/* Print Section - Hiển thị khi showPrintSection = true */}
           {showPrintSection && (
-            <Card id="print-section" className="mb-8">
+            <Card id="print-section" className="mb-8 animate-slideUp">
               <Card.Header>
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
@@ -318,7 +268,7 @@ export default function PaymentSuccess() {
           )}
 
           {/* Quick Tips */}
-          <Card>
+          <Card className="animate-slideUp" style={{ animationDelay: '0.6s' }}>
             <Card.Body className="p-6">
               <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

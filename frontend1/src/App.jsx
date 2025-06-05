@@ -6,6 +6,7 @@ import Footer from './components/layout/Footer'
 import Home from './pages/Home'
 import Book from './pages/Book'
 import Payment from './pages/Payment'
+import PaymentProcess from './pages/PaymentProcess'
 import PaymentSuccess from './pages/PaymentSuccess'
 import Bookings from './pages/Bookings'
 import Login from './pages/Login'
@@ -19,6 +20,8 @@ import UserManagement from './pages/admin/UserManagement'
 import FeedbackManagement from './pages/admin/FeedbackManagement'
 import TicketLookup from './pages/admin/TicketLookup'
 import SearchResults from './pages/SearchResults'
+import DestinationDetail from './pages/DestinationDetail'
+import AllDestinations from './pages/AllDestinations'
 import UsersManagement from './pages/UsersManagement'
 import Profile from './pages/Profile'
 import { useAuth } from './hooks/useAuth'
@@ -41,11 +44,15 @@ function AppContent() {
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/destination/:id" element={<DestinationDetail />} />
+          <Route path="/destinations" element={<AllDestinations />} />
 
           {/* Protected routes - User */}
           <Route path="/book" element={<ProtectedRoute><Book /></ProtectedRoute>} />
-          <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-          <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+          {/* Temporary: Remove protection for payment routes for testing */}
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment-process" element={<PaymentProcess />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/bookings" element={<ProtectedRoute><Bookings /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/users" element={<ProtectedRoute requiredRole="admin"><UsersManagement /></ProtectedRoute>} />
