@@ -19,6 +19,8 @@ import UserManagement from './pages/admin/UserManagement'
 import FeedbackManagement from './pages/admin/FeedbackManagement'
 import TicketLookup from './pages/admin/TicketLookup'
 import SearchResults from './pages/SearchResults'
+import UsersManagement from './pages/UsersManagement'
+import Profile from './pages/Profile'
 import { useAuth } from './hooks/useAuth'
 
 function AppContent() {
@@ -45,6 +47,8 @@ function AppContent() {
           <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
           <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/bookings" element={<ProtectedRoute><Bookings /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/users" element={<ProtectedRoute requiredRole="admin"><UsersManagement /></ProtectedRoute>} />
 
           {/* Protected routes - Admin */}
           <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminLayout /></ProtectedRoute>}>

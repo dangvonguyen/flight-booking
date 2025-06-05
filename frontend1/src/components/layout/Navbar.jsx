@@ -84,6 +84,16 @@ export default function Navbar() {
                       <FaUser className="w-4 h-4" />
                       Trang cá nhân
                     </Link>
+                    {role === 'admin' && (
+                      <Link
+                        to="/users"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <FaUserCircle className="w-4 h-4" />
+                        Quản lý người dùng
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -184,6 +194,16 @@ export default function Navbar() {
                     <FaUser className="w-5 h-5" />
                     Trang cá nhân
                   </Link>
+                  {role === 'admin' && (
+                    <Link
+                      to="/users"
+                      className="flex items-center gap-3 px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                      onClick={() => setShowMobileMenu(false)}
+                    >
+                      <FaUserCircle className="w-5 h-5" />
+                      Quản lý người dùng
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       handleLogout()
