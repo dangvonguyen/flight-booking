@@ -12,25 +12,25 @@ const mockBookings = [
     bookingCode: 'BK123456789',
     flight: {
       from: { city: 'Hà Nội', code: 'HAN' },
-      to: { city: 'Hồ Chí Minh', code: 'SGN' },
+      to: { city: 'TP. Hồ Chí Minh', code: 'SGN' },
       airline: 'Vietnam Airlines',
       flightNumber: 'VN123',
-      departureTime: '2024-03-20T08:00:00',
-      duration: '2h 00m',
+      departureTime: '2024-03-25T08:00:00',
+      duration: '2h 15m',
       seatClass: 'Economy'
     },
     passenger: {
-      firstName: 'Nguyễn',
-      lastName: 'Văn A',
+      firstName: 'Văn A',
+      lastName: 'Nguyễn',
       email: 'nguyenvana@example.com',
       phone: '0123456789'
     },
     seat: {
       number: '12A',
-      price: 500000
+      price: 100000
     },
     paymentMethod: 'Credit Card',
-    totalAmount: 2500000,
+    totalAmount: 2600000,
     status: 'confirmed',
     createdAt: '2024-03-15T10:00:00'
   },
@@ -38,53 +38,98 @@ const mockBookings = [
     id: 2,
     bookingCode: 'BK987654321',
     flight: {
-      from: { city: 'Hồ Chí Minh', code: 'SGN' },
+      from: { city: 'TP. Hồ Chí Minh', code: 'SGN' },
       to: { city: 'Đà Nẵng', code: 'DAD' },
-      airline: 'Vietnam Airlines',
-      flightNumber: 'VN456',
-      departureTime: '2024-03-25T14:00:00',
+      airline: 'Jetstar',
+      flightNumber: 'BL456',
+      departureTime: '2024-03-20T14:00:00',
       duration: '1h 15m',
       seatClass: 'Business'
     },
     passenger: {
-      firstName: 'Trần',
-      lastName: 'Thị B',
+      firstName: 'Thị B',
+      lastName: 'Trần',
       email: 'tranthib@example.com',
       phone: '0987654321'
     },
     seat: {
       number: '5C',
-      price: 1000000
+      price: 200000
     },
-    paymentMethod: 'Bank Transfer',
-    totalAmount: 3500000,
+    paymentMethod: 'VNPay',
+    totalAmount: 3700000,
     status: 'confirmed',
     createdAt: '2024-03-16T15:30:00'
+  },
+  {
+    id: 3,
+    bookingCode: 'BK555444333',
+    flight: {
+      from: { city: 'Đà Nẵng', code: 'DAD' },
+      to: { city: 'Hà Nội', code: 'HAN' },
+      airline: 'VietJet Air',
+      flightNumber: 'VJ789',
+      departureTime: '2024-02-15T16:30:00',
+      duration: '1h 25m',
+      seatClass: 'Economy'
+    },
+    passenger: {
+      firstName: 'Văn C',
+      lastName: 'Lê',
+      email: 'levanc@example.com',
+      phone: '0912345678'
+    },
+    seat: {
+      number: '8B',
+      price: 50000
+    },
+    paymentMethod: 'MoMo',
+    totalAmount: 1850000,
+    status: 'confirmed',
+    createdAt: '2024-02-10T09:15:00'
   }
 ]
 
 export default function Bookings() {
   const navigate = useNavigate()
   const [searchCode, setSearchCode] = useState('')
-  const [searchEmail, setSearchEmail] = useState('')
   const [bookings, setBookings] = useState(mockBookings)
   const [selectedBooking, setSelectedBooking] = useState(null)
   const [filter, setFilter] = useState('all') // all, upcoming, past
 
   const handleSearch = (e) => {
     e.preventDefault()
-    // Trong thực tế, đây sẽ là API call
-    const filteredBookings = mockBookings.filter(booking => {
-      const matchCode = searchCode ? booking.bookingCode.includes(searchCode) : true
-      const matchEmail = searchEmail ? booking.passenger.email.includes(searchEmail) : true
-      return matchCode && matchEmail
-    })
-    setBookings(filteredBookings)
+    if (searchCode.trim()) {
+      const filteredBookings = mockBookings.filter(booking => 
+        booking.bookingCode.toLowerCase().includes(searchCode.toLowerCase())
+      )
+      setBookings(filteredBookings)
+    } else {
+      setBookings(mockBookings)
+    }
   }
 
-  const handleCancelBooking = (bookingId) => {
-    // Trong thực tế, đây sẽ là API call
-    setBookings(bookings.filter(booking => booking.id !== bookingId))
+  const handleClearSearch = () => {
+    setSearchCode('')
+    setBookings(mockBookings)
+  }
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'confirmed': return 'bg-green-100 text-green-800'
+      case 'cancelled': return 'bg-red-100 text-red-800'
+      case 'pending': return 'bg-yellow-100 text-yellow-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'confirmed': return 'Đã xác nhận'
+      case 'cancelled': return 'Đã hủy'
+      case 'pending': return 'Chờ xác nhận'
+      default: return 'Không xác định'
+    }
   }
 
   const filteredBookings = bookings.filter(booking => {
@@ -100,85 +145,163 @@ export default function Bookings() {
     return true
   })
 
+  const upcomingCount = mockBookings.filter(b => new Date(b.flight.departureTime) > new Date()).length
+  const pastCount = mockBookings.filter(b => new Date(b.flight.departureTime) < new Date()).length
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Lịch sử đặt vé
-          </h1>
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Lịch sử đặt vé
+              </h1>
+              <p className="text-gray-600">
+                Quản lý và theo dõi các chuyến bay đã đặt
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate('/')}
+              variant="primary"
+            >
+              Đặt vé mới
+            </Button>
+          </div>
+
+          {/* Search */}
+          <Card className="mb-6">
+            <Card.Body>
+              <form onSubmit={handleSearch} className="flex gap-4">
+                <div className="flex-1">
+                  <Input
+                    label="Tìm kiếm theo mã đặt vé"
+                    value={searchCode}
+                    onChange={(e) => setSearchCode(e.target.value)}
+                    placeholder="Nhập mã đặt vé..."
+                  />
+                </div>
+                <div className="flex gap-2 items-end">
+                  <Button type="submit">
+                    Tìm kiếm
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={handleClearSearch}
+                  >
+                    Xóa
+                  </Button>
+                </div>
+              </form>
+            </Card.Body>
+          </Card>
           
-          {/* Bộ lọc */}
-          <div className="flex space-x-4 mb-6">
+          {/* Filter */}
+          <div className="flex gap-4 mb-6">
             <Button
               variant={filter === 'all' ? 'primary' : 'outline'}
               onClick={() => setFilter('all')}
             >
-              Tất cả
+              Tất cả ({mockBookings.length})
             </Button>
             <Button
               variant={filter === 'upcoming' ? 'primary' : 'outline'}
               onClick={() => setFilter('upcoming')}
             >
-              Sắp tới
+              Sắp tới ({upcomingCount})
             </Button>
             <Button
               variant={filter === 'past' ? 'primary' : 'outline'}
               onClick={() => setFilter('past')}
             >
-              Đã qua
+              Đã bay ({pastCount})
             </Button>
           </div>
 
-          {/* Danh sách đặt vé */}
+          {/* Booking list */}
           <div className="space-y-4">
             {filteredBookings.map(booking => (
-              <Card key={booking.id}>
+              <Card key={booking.id} className="hover:shadow-lg transition-shadow">
                 <Card.Body>
-                  <div className="flex flex-col md:flex-row md:items-center justify-between">
+                  <div className="flex justify-between items-start">
+                    {/* Flight info */}
                     <div className="flex-1">
-                      <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                      <div className="flex items-center gap-4 mb-4">
                         <div className="text-center">
                           <p className="text-sm text-gray-600">Điểm đi</p>
-                          <p className="font-semibold">{booking.flight.from.city}</p>
-                          <p className="text-sm text-gray-600">{booking.flight.from.code}</p>
+                          <p className="text-xl font-semibold">{booking.flight.from.code}</p>
+                          <p className="text-sm text-gray-600">{booking.flight.from.city}</p>
                         </div>
-                        <div className="flex-1">
+                        
+                        <div className="flex-1 px-4">
                           <div className="flex items-center">
-                            <div className="flex-1 border-t border-gray-300"></div>
-                            <svg className="w-6 h-6 text-gray-400 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                            <div className="flex-1 border-t border-gray-300"></div>
+                            <div className="flex-1 border-t-2 border-dashed border-gray-300"></div>
+                            <div className="mx-2 p-2 bg-primary-100 rounded-full">
+                              <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 border-t-2 border-dashed border-gray-300"></div>
                           </div>
-                          <p className="text-center text-sm text-gray-600 mt-1">
+                          <p className="text-center text-sm text-gray-600 mt-1 font-medium">
                             {booking.flight.duration}
                           </p>
                         </div>
+                        
                         <div className="text-center">
                           <p className="text-sm text-gray-600">Điểm đến</p>
-                          <p className="font-semibold">{booking.flight.to.city}</p>
-                          <p className="text-sm text-gray-600">{booking.flight.to.code}</p>
+                          <p className="text-xl font-semibold">{booking.flight.to.code}</p>
+                          <p className="text-sm text-gray-600">{booking.flight.to.city}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-600">Chuyến bay</p>
+                          <p className="font-semibold">{booking.flight.flightNumber}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Ngày bay</p>
+                          <p className="font-semibold">
+                            {new Date(booking.flight.departureTime).toLocaleDateString('vi-VN')}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Ghế</p>
+                          <p className="font-semibold">{booking.seat.number}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Tổng tiền</p>
+                          <p className="font-semibold text-primary-600">
+                            {booking.totalAmount.toLocaleString('vi-VN')}đ
+                          </p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col md:items-end space-y-2">
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">Mã đặt chỗ</p>
-                        <p className="font-medium">{booking.bookingCode}</p>
+
+                    {/* Actions */}
+                    <div className="ml-6 text-right space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-600">Mã đặt vé</p>
+                        <p className="font-mono font-semibold">{booking.bookingCode}</p>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                          {getStatusText(booking.status)}
+                        </span>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">Ngày bay</p>
-                        <p className="font-medium">
-                          {new Date(booking.flight.departureTime).toLocaleDateString('vi-VN')}
-                        </p>
+                      
+                      <div className="space-y-2">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => setSelectedBooking(booking)}
+                          className="w-full"
+                        >
+                          Xem chi tiết
+                        </Button>
+
                       </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => setSelectedBooking(booking)}
-                      >
-                        Xem chi tiết
-                      </Button>
                     </div>
                   </div>
                 </Card.Body>
@@ -191,6 +314,12 @@ export default function Bookings() {
                   <p className="text-gray-600">
                     Không tìm thấy đặt vé nào
                   </p>
+                  <Button 
+                    onClick={() => navigate('/')}
+                    className="mt-4"
+                  >
+                    Đặt vé ngay
+                  </Button>
                 </Card.Body>
               </Card>
             )}

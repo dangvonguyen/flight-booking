@@ -1,68 +1,247 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { FaPlane, FaUser, FaSignOutAlt, FaUserCircle, FaBars, FaTimes } from 'react-icons/fa'
 import Button from '../ui/Button'
 
 export default function Navbar() {
   const { user, role, logout } = useAuth()
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
+
+  const handleLogout = () => {
+    logout()
+    setShowUserMenu(false)
+  }
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="container mx-auto px-4">
+    <nav className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <svg
-              className="w-8 h-8 text-primary-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-            <span className="text-xl font-semibold text-gray-900">Flight Booking</span>
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-200">
+              <FaPlane className="w-5 h-5 text-white transform group-hover:scale-110 transition-transform duration-200" />
+            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              UITSKY
+            </span>
           </Link>
 
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {user && (
-              <Link to="/bookings" className="text-gray-600 hover:text-gray-900">
+              <Link 
+                to="/bookings" 
+                className="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
+              >
                 Lịch sử đặt vé
               </Link>
             )}
-            <Link to="/about" className="text-gray-600 hover:text-gray-900">
+            <Link 
+              to="/about" 
+              className="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
+            >
               Giới thiệu
             </Link>
-            <Link to="/contact" className="text-gray-600 hover:text-gray-900">
+            <Link 
+              to="/contact" 
+              className="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
+            >
               Liên hệ
             </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
+          {/* Desktop User Section */}
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">
-                  Xin chào, {user.firstName}
-                </span>
-                <Button variant="outline" onClick={logout}>
-                  Đăng xuất
-                </Button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-3 bg-gray-50 hover:bg-gray-100 rounded-lg px-3 py-2 transition-colors duration-200"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <FaUserCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-gray-900">
+                      {user.firstName} {user.lastName}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}
+                    </div>
+                  </div>
+                </button>
+
+                {/* User Dropdown */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <FaUser className="w-4 h-4" />
+                      Trang cá nhân
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <FaSignOutAlt className="w-4 h-4" />
+                      Đăng xuất
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
-              <>
+              <div className="flex items-center space-x-3">
                 <Link to="/login">
-                  <Button variant="outline">Đăng nhập</Button>
+                  <Button 
+                    variant="outline" 
+                    className="px-6 py-2 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 rounded-full font-medium transition-all duration-200"
+                  >
+                    Đăng nhập
+                  </Button>
                 </Link>
                 <Link to="/register">
-                  <Button>Đăng ký</Button>
+                  <Button 
+                    className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    Đăng ký
+                  </Button>
                 </Link>
-              </>
+              </div>
             )}
           </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+            >
+              {showMobileMenu ? (
+                <FaTimes className="w-6 h-6" />
+              ) : (
+                <FaBars className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="md:hidden border-t border-gray-200 bg-white">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {user && (
+                <Link
+                  to="/bookings"
+                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Lịch sử đặt vé
+                </Link>
+              )}
+              <Link
+                to="/about"
+                className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Giới thiệu
+              </Link>
+              <Link
+                to="/contact"
+                className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Liên hệ
+              </Link>
+            </div>
+
+            {/* Mobile User Section */}
+            <div className="border-t border-gray-200 pt-4 pb-3">
+              {user ? (
+                <div className="space-y-3 px-2">
+                  <div className="flex items-center space-x-3 px-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                      <FaUserCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-base font-medium text-gray-900">
+                        {user.firstName} {user.lastName}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}
+                      </div>
+                    </div>
+                  </div>
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-3 px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <FaUser className="w-5 h-5" />
+                    Trang cá nhân
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout()
+                      setShowMobileMenu(false)
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                  >
+                    <FaSignOutAlt className="w-5 h-5" />
+                    Đăng xuất
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2 px-2">
+                  <Link
+                    to="/login"
+                    className="block w-full"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Button 
+                      variant="outline" 
+                      className="w-full px-4 py-3 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 rounded-lg font-medium"
+                    >
+                      Đăng nhập
+                    </Button>
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block w-full"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Button 
+                      className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium"
+                    >
+                      Đăng ký
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Backdrop for mobile menu */}
+      {showMobileMenu && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-25 z-40 md:hidden"
+          onClick={() => setShowMobileMenu(false)}
+        />
+      )}
+
+      {/* Backdrop for user menu */}
+      {showUserMenu && (
+        <div 
+          className="fixed inset-0 z-40"
+          onClick={() => setShowUserMenu(false)}
+        />
+      )}
     </nav>
   )
 } 

@@ -1,139 +1,221 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import Card from '../components/ui/Card'
+import Button from '../components/ui/Button'
+
+// Mock data for testing
+const mockPaymentData = {
+  bookingId: 'BK12345678',
+  flight: {
+    id: 'FL001',
+    flightNumber: 'VN123',
+    airline: 'Vietnam Airlines',
+    from: {
+      code: 'SGN',
+      city: 'TP. Hồ Chí Minh',
+      time: '08:30',
+      date: '2024-01-15'
+    },
+    to: {
+      code: 'HAN',
+      city: 'Hà Nội',
+      time: '10:45',
+      date: '2024-01-15'
+    },
+    duration: '2h 15m',
+    price: 2500000,
+    seatClass: 'economy'
+  },
+  passengerInfo: {
+    firstName: 'Văn A',
+    lastName: 'Nguyễn',
+    email: 'nguyenvana@email.com',
+    phone: '0901234567',
+    dateOfBirth: '1990-01-01',
+    nationality: 'Việt Nam',
+    passportNumber: 'AB1234567'
+  },
+  paymentMethod: 'vnpay',
+  selectedSeat: {
+    number: '12A',
+    type: 'window',
+    price: 100000
+  },
+  departureAirport: {
+    airport_name: 'Sân bay Tân Sơn Nhất',
+    city: 'TP. Hồ Chí Minh'
+  },
+  arrivalAirport: {
+    airport_name: 'Sân bay Nội Bài',
+    city: 'Hà Nội'
+  },
+  totalAmount: 2600000
+}
 
 export default function PaymentProcess() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { flight, seatClass, passengerInfo, paymentMethod, cardInfo, selectedSeat, searchParams } = location.state || {}
+  const [processing, setProcessing] = useState(true)
+  const [countdown, setCountdown] = useState(3)
 
-  const [status, setStatus] = useState('processing')
-  const [progress, setProgress] = useState(0)
+  // Use mock data if no real data is available
+  const {
+    bookingId = mockPaymentData.bookingId,
+    flight = mockPaymentData.flight,
+    passengerInfo = mockPaymentData.passengerInfo,
+    paymentMethod = mockPaymentData.paymentMethod,
+    selectedSeat = mockPaymentData.selectedSeat,
+    departureAirport = mockPaymentData.departureAirport,
+    arrivalAirport = mockPaymentData.arrivalAirport,
+    totalAmount = mockPaymentData.totalAmount
+  } = location.state || {}
 
   useEffect(() => {
-    if (!flight || !passengerInfo) {
-      navigate('/')
-      return
-    }
-    // Simulate payment processing
-    const timer = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(timer)
-          setStatus('success')
-          return 100
-        }
-        return prev + 10
-      })
-    }, 500)
-    return () => clearInterval(timer)
-  }, [flight, passengerInfo, navigate])
+    // Remove validation since we're using mock data
+    // if (!flight || !passengerInfo) {
+    //   navigate('/')
+    //   return
+    // }
 
-  if (!flight || !passengerInfo) {
-    return null
+    // Giả lập quá trình thanh toán
+    const timer = setTimeout(() => {
+      setProcessing(false)
+      
+      // Đếm ngược 3 giây rồi chuyển sang trang thành công
+      const countdownTimer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownTimer)
+            navigate('/payment-success', {
+              state: {
+                bookingId,
+                flight,
+                passengerInfo,
+                selectedSeat,
+                paymentMethod,
+                departureAirport,
+                arrivalAirport,
+                totalAmount,
+                bookingDate: new Date().toISOString()
+              }
+            })
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    }, 3000)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [flight, passengerInfo, navigate, bookingId, selectedSeat, paymentMethod, departureAirport, arrivalAirport, totalAmount])
+
+  const getPaymentMethodName = (method) => {
+    const methods = {
+      'vnpay': 'VNPay',
+      'credit-card': 'Thẻ tín dụng',
+      'momo': 'MoMo',
+      'zalopay': 'ZaloPay',
+      'bank-transfer': 'Chuyển khoản ngân hàng',
+      'paypal': 'PayPal'
+    }
+    return methods[method] || method
   }
 
+  // Removed validation since we're using mock data for testing
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            {status === 'processing' ? 'Đang xử lý thanh toán' : 'Thanh toán thành công'}
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {status === 'processing' 
-              ? 'Vui lòng đợi trong giây lát...'
-              : 'Cảm ơn bạn đã đặt vé với chúng tôi'}
-          </p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <Card.Body className="text-center py-12">
+              {processing ? (
+                <>
+                  <div className="mb-6">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-600 border-t-transparent mx-auto"></div>
+                  </div>
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                    Đang xử lý thanh toán...
+                  </h2>
+                  <p className="text-gray-600 mb-8">
+                    Vui lòng đợi trong giây lát. Chúng tôi đang xử lý thanh toán của bạn.
+                  </p>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-left">
+                    <h3 className="font-semibold text-blue-900 mb-4">Thông tin thanh toán:</h3>
+                    <div className="space-y-2 text-sm text-blue-800">
+                      <div className="flex justify-between">
+                        <span>Mã đặt vé:</span>
+                        <span className="font-mono">{bookingId}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Chuyến bay:</span>
+                        <span>{flight.flightNumber}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Tuyến:</span>
+                        <span>{flight.from.code} → {flight.to.code}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Hành khách:</span>
+                        <span>{passengerInfo.lastName} {passengerInfo.firstName}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Phương thức:</span>
+                        <span>{getPaymentMethodName(paymentMethod)}</span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span>Tổng tiền:</span>
+                        <span>{totalAmount?.toLocaleString('vi-VN')}đ</span>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                    Thanh toán thành công!
+                  </h2>
+                  <p className="text-gray-600 mb-6">
+                    Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi. Vé máy bay đã được đặt thành công.
+                  </p>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                    <p className="text-green-800 text-sm">
+                      Bạn sẽ được chuyển đến trang thành công trong {countdown} giây...
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => navigate('/payment-success', {
+                      state: {
+                        bookingId,
+                        flight,
+                        passengerInfo,
+                        selectedSeat,
+                        paymentMethod,
+                        departureAirport,
+                        arrivalAirport,
+                        totalAmount,
+                        bookingDate: new Date().toISOString()
+                      }
+                    })}
+                    className="w-full"
+                  >
+                    Xem vé máy bay
+                  </Button>
+                </>
+              )}
+            </Card.Body>
+          </Card>
         </div>
-
-        {status === 'processing' && (
-          <div className="mt-8">
-            <div className="relative pt-1">
-              <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary-200">
-                <div
-                  style={{ width: `${progress}%` }}
-                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary-500 transition-all duration-500"
-                ></div>
-              </div>
-              <div className="text-center text-sm text-gray-600">
-                {progress}%
-              </div>
-            </div>
-          </div>
-        )}
-
-        {status === 'success' && (
-          <div className="mt-8">
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-              <div className="px-4 py-5 sm:px-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Thông tin đặt vé
-                </h3>
-              </div>
-              <div className="border-t border-gray-200">
-                <dl>
-                  <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Hành khách</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {passengerInfo.firstName} {passengerInfo.lastName}
-                    </dd>
-                  </div>
-                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Chuyến bay</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {flight.airline} - {flight.flightNumber}
-                    </dd>
-                  </div>
-                  <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Hành trình</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {flight.from.city} → {flight.to.city}
-                    </dd>
-                  </div>
-                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Thời gian</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {flight.from.time} - {flight.to.time} ({flight.from.date})
-                    </dd>
-                  </div>
-                  <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Hạng vé</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {seatClass === 'economy' ? 'Phổ thông' : seatClass === 'business' ? 'Thương gia' : 'Hạng nhất'}
-                    </dd>
-                  </div>
-                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Ghế</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {selectedSeat?.number}
-                    </dd>
-                  </div>
-                  <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Phương thức thanh toán</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {paymentMethod === 'credit-card' ? 'Thẻ tín dụng/ghi nợ' : paymentMethod === 'momo' ? 'Ví MoMo' : paymentMethod === 'zalopay' ? 'ZaloPay' : 'Chuyển khoản ngân hàng'}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-center space-x-4">
-              <button
-                onClick={() => navigate('/')}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              >
-                Về trang chủ
-              </button>
-              <button
-                onClick={() => navigate('/bookings')}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              >
-                Xem đặt vé của tôi
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )

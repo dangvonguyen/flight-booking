@@ -3,14 +3,122 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
-import { mockPaymentMethods } from '../mocks/flightData'
+
+// Mock data for testing
+const mockData = {
+  flightDetails: {
+    id: 'FL001',
+    flightNumber: 'VN123',
+    airline: 'Vietnam Airlines',
+    from: {
+      code: 'SGN',
+      city: 'TP. Hồ Chí Minh',
+      time: '08:30',
+      date: '2024-01-15'
+    },
+    to: {
+      code: 'HAN',
+      city: 'Hà Nội',
+      time: '10:45',
+      date: '2024-01-15'
+    },
+    duration: '2h 15m',
+    price: 2500000,
+    seatClass: 'economy',
+    aircraft: 'Airbus A321'
+  },
+  passengerInfo: {
+    firstName: 'Văn A',
+    lastName: 'Nguyễn',
+    email: 'nguyenvana@email.com',
+    phone: '0901234567',
+    dateOfBirth: '1990-01-01',
+    nationality: 'Việt Nam',
+    passportNumber: 'AB1234567'
+  },
+  selectedSeat: {
+    number: '12A',
+    type: 'window',
+    price: 100000
+  },
+  searchParams: {
+    from: 'SGN',
+    to: 'HAN',
+    departDate: '2024-01-15',
+    passengers: 1,
+    seatClass: 'economy'
+  },
+  departureAirport: {
+    airport_name: 'Sân bay Tân Sơn Nhất',
+    city: 'TP. Hồ Chí Minh'
+  },
+  arrivalAirport: {
+    airport_name: 'Sân bay Nội Bài',
+    city: 'Hà Nội'
+  }
+}
+
+// Payment methods data
+const paymentMethods = [
+  {
+    id: 'vnpay',
+    name: 'VNPay',
+    icon: '💳',
+    description: 'Thanh toán qua VNPay QR Code',
+    fee: 0
+  },
+  {
+    id: 'credit-card',
+    name: 'Thẻ tín dụng/ghi nợ',
+    icon: '💳',
+    description: 'Thanh toán bằng thẻ Visa, Mastercard, JCB',
+    fee: 25000
+  },
+  {
+    id: 'momo',
+    name: 'Ví MoMo',
+    icon: '📱',
+    description: 'Thanh toán qua ứng dụng MoMo',
+    fee: 0
+  },
+  {
+    id: 'zalopay',
+    name: 'ZaloPay',
+    icon: '💸',
+    description: 'Thanh toán qua ứng dụng ZaloPay',
+    fee: 0
+  },
+  {
+    id: 'bank-transfer',
+    name: 'Chuyển khoản ngân hàng',
+    icon: '🏦',
+    description: 'Chuyển khoản trực tiếp đến tài khoản ngân hàng',
+    fee: 0
+  },
+  {
+    id: 'paypal',
+    name: 'PayPal',
+    icon: '🌐',
+    description: 'Thanh toán qua tài khoản PayPal',
+    fee: 50000
+  }
+]
 
 export default function Payment() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { flightDetails, passengerInfo, selectedSeat, searchParams } = location.state || {}
+  
+  // Use mock data if no real data is available
+  const { 
+    flightDetails = mockData.flightDetails, 
+    passengerInfo = mockData.passengerInfo, 
+    selectedSeat = mockData.selectedSeat, 
+    searchParams = mockData.searchParams,
+    departureAirport = mockData.departureAirport,
+    arrivalAirport = mockData.arrivalAirport 
+  } = location.state || {}
 
-  const [selectedMethod, setSelectedMethod] = useState('credit-card')
+  const [selectedMethod, setSelectedMethod] = useState('vnpay')
   const [cardInfo, setCardInfo] = useState({
     number: '',
     name: '',
@@ -19,26 +127,13 @@ export default function Payment() {
   })
   const [errors, setErrors] = useState({})
 
-  if (!flightDetails || !passengerInfo || !selectedSeat) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-900">
-            Không tìm thấy thông tin đặt vé
-          </h2>
-          <p className="mt-2 text-gray-600">
-            Vui lòng quay lại trang tìm kiếm
-          </p>
-          <Button
-            onClick={() => navigate('/search')}
-            className="mt-4"
-          >
-            Quay lại tìm kiếm
-          </Button>
-        </div>
-      </div>
-    )
-  }
+  // Removed validation since we're using mock data for testing
+
+  // Tính toán giá
+  const ticketPrice = flightDetails.price
+  const seatFee = selectedSeat?.price || 0
+  const paymentFee = paymentMethods.find(m => m.id === selectedMethod)?.fee || 0
+  const totalPrice = ticketPrice + seatFee + paymentFee
 
   const validateCardInfo = () => {
     const newErrors = {}
@@ -69,9 +164,12 @@ export default function Payment() {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (validateCardInfo()) {
-      // Xử lý thanh toán ở đây
+      // Tạo booking ID
+      const bookingId = `BK${Date.now().toString().slice(-8)}`
+      
       navigate('/payment-process', {
         state: {
+          bookingId,
           flight: flightDetails,
           seatClass: flightDetails.seatClass,
           passengerInfo,
@@ -79,6 +177,9 @@ export default function Payment() {
           cardInfo: selectedMethod === 'credit-card' ? cardInfo : null,
           selectedSeat,
           searchParams,
+          departureAirport,
+          arrivalAirport,
+          totalAmount: totalPrice
         },
       })
     }
@@ -103,71 +204,92 @@ export default function Payment() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl font-semibold text-gray-900 mb-8">
             Thanh toán
           </h1>
 
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Thông tin đơn hàng */}
-              <div className="md:col-span-2">
+              <div className="lg:col-span-2 space-y-6">
+                {/* Thông tin chuyến bay */}
                 <Card>
                   <Card.Header>
-                    <h2 className="text-lg font-medium">Thông tin đơn hàng</h2>
+                    <h2 className="text-lg font-medium">Thông tin chuyến bay</h2>
                   </Card.Header>
                   <Card.Body>
                     <div className="space-y-4">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Chuyến bay</span>
-                        <span className="font-medium">
-                          {flightDetails.from.city} ({flightDetails.from.code}) →{' '}
-                          {flightDetails.to.city} ({flightDetails.to.code})
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Ngày</span>
-                        <span className="font-medium">{flightDetails.from.date}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Giờ</span>
-                        <span className="font-medium">{flightDetails.from.time}</span>
-                      </div>
-                      <div className="flex justify-between">
                         <span className="text-gray-600">Hãng hàng không</span>
-                        <span className="font-medium">
-                          {flightDetails.airline}
-                        </span>
+                        <span className="font-medium">{flightDetails.airline}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Số hiệu chuyến bay</span>
-                        <span className="font-medium">
-                          {flightDetails.flightNumber}
-                        </span>
+                        <span className="font-medium">{flightDetails.flightNumber}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Ghế</span>
-                        <span className="font-medium">{selectedSeat.number}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Hành khách</span>
-                        <span className="font-medium">
-                          {passengerInfo.lastName} {passengerInfo.firstName}
-                        </span>
-                      </div>
-                      <div className="border-t pt-4">
-                        <div className="flex justify-between text-lg font-semibold">
-                          <span>Tổng cộng</span>
-                          <span>
-                            {flightDetails.price.toLocaleString('vi-VN')}đ
-                          </span>
+                        <span className="text-gray-600">Tuyến bay</span>
+                        <div className="text-right">
+                          <div className="font-medium">
+                            {departureAirport?.airport_name || flightDetails.from.city} → {arrivalAirport?.airport_name || flightDetails.to.city}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {flightDetails.from.code} → {flightDetails.to.code}
+                          </div>
                         </div>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Ngày bay</span>
+                        <span className="font-medium">{flightDetails.from.date}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Thời gian</span>
+                        <span className="font-medium">
+                          {flightDetails.from.time} → {flightDetails.to.time}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Thời gian bay</span>
+                        <span className="font-medium">{flightDetails.duration}</span>
                       </div>
                     </div>
                   </Card.Body>
                 </Card>
 
-                <Card className="mt-6">
+                {/* Thông tin hành khách */}
+                <Card>
+                  <Card.Header>
+                    <h2 className="text-lg font-medium">Thông tin hành khách</h2>
+                  </Card.Header>
+                  <Card.Body>
+                    <div className="space-y-4">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Họ tên</span>
+                        <span className="font-medium">
+                          {passengerInfo.lastName} {passengerInfo.firstName}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Email</span>
+                        <span className="font-medium">{passengerInfo.email}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Điện thoại</span>
+                        <span className="font-medium">{passengerInfo.phone}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Ghế ngồi</span>
+                        <span className="font-medium">
+                          {selectedSeat.number} ({flightDetails.seatClass === 'business' ? 'Thương gia' : 'Phổ thông'})
+                        </span>
+                      </div>
+                    </div>
+                  </Card.Body>
+                </Card>
+
+                {/* Phương thức thanh toán */}
+                <Card>
                   <Card.Header>
                     <h2 className="text-lg font-medium">
                       Phương thức thanh toán
@@ -175,21 +297,28 @@ export default function Payment() {
                   </Card.Header>
                   <Card.Body>
                     <div className="space-y-4">
-                      {mockPaymentMethods.map((method) => (
+                      {paymentMethods.map((method) => (
                         <div
                           key={method.id}
-                          className={`flex items-center p-4 border rounded-lg cursor-pointer ${
+                          className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
                             selectedMethod === method.id
                               ? 'border-primary-500 bg-primary-50'
-                              : 'border-gray-200'
+                              : 'border-gray-200 hover:border-gray-300'
                           }`}
                           onClick={() => setSelectedMethod(method.id)}
                         >
                           <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center text-2xl">
                             {method.icon}
                           </div>
-                          <div className="ml-4">
-                            <h3 className="font-medium">{method.name}</h3>
+                          <div className="ml-4 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium">{method.name}</h3>
+                              {method.fee > 0 && (
+                                <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                                  +{method.fee.toLocaleString('vi-VN')}đ
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm text-gray-500">
                               {method.description}
                             </p>
@@ -198,12 +327,12 @@ export default function Payment() {
                             <div
                               className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                                 selectedMethod === method.id
-                                  ? 'border-primary-500'
+                                  ? 'border-primary-500 bg-primary-500'
                                   : 'border-gray-300'
                               }`}
                             >
                               {selectedMethod === method.id && (
-                                <div className="w-3 h-3 rounded-full bg-primary-500" />
+                                <div className="w-2 h-2 rounded-full bg-white" />
                               )}
                             </div>
                           </div>
@@ -211,44 +340,60 @@ export default function Payment() {
                       ))}
                     </div>
 
+                    {/* Thông tin thẻ tín dụng */}
                     {selectedMethod === 'credit-card' && (
-                      <div className="mt-6 space-y-4">
-                        <Input
-                          label="Số thẻ"
-                          value={cardInfo.number}
-                          onChange={handleCardNumberChange}
-                          placeholder="1234 5678 9012 3456"
-                          error={errors.number}
-                        />
-                        <Input
-                          label="Tên trên thẻ"
-                          value={cardInfo.name}
-                          onChange={(e) =>
-                            setCardInfo({ ...cardInfo, name: e.target.value })
-                          }
-                          placeholder="NGUYEN VAN A"
-                          error={errors.name}
-                        />
-                        <div className="grid grid-cols-2 gap-4">
-                          <Input
-                            label="Ngày hết hạn"
-                            value={cardInfo.expiry}
-                            onChange={handleExpiryChange}
-                            placeholder="MM/YY"
-                            error={errors.expiry}
-                          />
-                          <Input
-                            label="Mã CVV"
-                            value={cardInfo.cvv}
-                            onChange={(e) =>
-                              setCardInfo({
-                                ...cardInfo,
-                                cvv: e.target.value.replace(/\D/g, '').slice(0, 4),
-                              })
-                            }
-                            placeholder="123"
-                            error={errors.cvv}
-                          />
+                      <div className="mt-6 pt-6 border-t">
+                        <h3 className="text-md font-medium mb-4">
+                          Thông tin thẻ tín dụng
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="md:col-span-2">
+                            <Input
+                              label="Số thẻ"
+                              value={cardInfo.number}
+                              onChange={handleCardNumberChange}
+                              placeholder="1234 5678 9012 3456"
+                              error={errors.number}
+                              maxLength={19}
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <Input
+                              label="Tên trên thẻ"
+                              value={cardInfo.name}
+                              onChange={(e) =>
+                                setCardInfo({ ...cardInfo, name: e.target.value.toUpperCase() })
+                              }
+                              placeholder="NGUYEN VAN A"
+                              error={errors.name}
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              label="Ngày hết hạn"
+                              value={cardInfo.expiry}
+                              onChange={handleExpiryChange}
+                              placeholder="MM/YY"
+                              error={errors.expiry}
+                              maxLength={5}
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              label="Mã CVV"
+                              value={cardInfo.cvv}
+                              onChange={(e) =>
+                                setCardInfo({ 
+                                  ...cardInfo, 
+                                  cvv: e.target.value.replace(/\D/g, '').slice(0, 4) 
+                                })
+                              }
+                              placeholder="123"
+                              error={errors.cvv}
+                              maxLength={4}
+                              type="password"
+                            />
+                          </div>
                         </div>
                       </div>
                     )}
@@ -256,44 +401,49 @@ export default function Payment() {
                 </Card>
               </div>
 
-              {/* Tổng kết */}
-              <div>
-                <Card>
+              {/* Tóm tắt giá */}
+              <div className="lg:col-span-1">
+                <Card className="sticky top-8">
                   <Card.Header>
-                    <h2 className="text-lg font-medium">Tổng kết</h2>
+                    <h2 className="text-lg font-medium">Tóm tắt đơn hàng</h2>
                   </Card.Header>
                   <Card.Body>
                     <div className="space-y-4">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Giá vé</span>
-                        <span>
-                          {flightDetails.price.toLocaleString('vi-VN')}đ
+                        <span className="font-medium">
+                          {ticketPrice.toLocaleString('vi-VN')}đ
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Thuế</span>
-                        <span>0đ</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Phí dịch vụ</span>
-                        <span>0đ</span>
-                      </div>
+                      {seatFee > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Phí chọn ghế</span>
+                          <span className="font-medium">
+                            {seatFee.toLocaleString('vi-VN')}đ
+                          </span>
+                        </div>
+                      )}
+                      {paymentFee > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Phí thanh toán</span>
+                          <span className="font-medium">
+                            {paymentFee.toLocaleString('vi-VN')}đ
+                          </span>
+                        </div>
+                      )}
                       <div className="border-t pt-4">
                         <div className="flex justify-between text-lg font-semibold">
                           <span>Tổng cộng</span>
-                          <span>
-                            {flightDetails.price.toLocaleString('vi-VN')}đ
+                          <span className="text-primary-600">
+                            {totalPrice.toLocaleString('vi-VN')}đ
                           </span>
                         </div>
                       </div>
                     </div>
                   </Card.Body>
                   <Card.Footer>
-                    <Button
-                      type="submit"
-                      className="w-full"
-                    >
-                      Thanh toán
+                    <Button type="submit" className="w-full">
+                      Tiến hành thanh toán
                     </Button>
                   </Card.Footer>
                 </Card>
