@@ -335,7 +335,7 @@ export default function HeroSearch() {
                   ref={toInputRef}
                   type="text"
                   className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder-gray-500 text-lg font-medium hover:border-blue-400 group-hover:shadow-md"
-                  placeholder="Điểm đếnr"
+                  placeholder="Điểm đến"
                   value={formData.toDisplay}
                   onChange={handleToChange}
                   onFocus={() => setShowToSuggestions(true)}

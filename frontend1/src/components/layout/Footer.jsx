@@ -30,6 +30,11 @@ export default function Footer() {
                   Liên hệ
                 </Link>
               </li>
+              <li>
+                <Link to="/destinations" className="text-gray-400 hover:text-white">
+                  Điểm đến
+                </Link>
+              </li>
             </ul>
           </div>
 

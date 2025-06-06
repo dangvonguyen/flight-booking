@@ -17,6 +17,7 @@ import SearchResults from './pages/SearchResults'
 import DestinationDetail from './pages/DestinationDetail'
 import AllDestinations from './pages/AllDestinations'
 import Profile from './pages/Profile'
+import TicketLookup from './pages/TicketLookup'
 
 function AppContent() {
   return (
@@ -32,6 +33,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />
           <Route path="/destinations" element={<AllDestinations />} />
+          <Route path="/ticket-lookup" element={<TicketLookup />} />
 
           {/* Protected routes - User */}
           <Route path="/book" element={<ProtectedRoute><Book /></ProtectedRoute>} />

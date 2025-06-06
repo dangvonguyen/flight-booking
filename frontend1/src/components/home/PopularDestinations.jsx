@@ -6,7 +6,6 @@ const destinations = [
     name: 'Gia Lai',
     image: '/images/destinations/gialai.png',
     description: 'Cao nguyên xanh mướt với những đồi chè bất tận',
-    highlights: ['Biển Hồ', 'Đồi chè Chư Sê'],
     weather: '22°C',
     region: 'Tây Nguyên',
   },
@@ -15,7 +14,6 @@ const destinations = [
     name: 'Hà Nội',
     image: '/images/destinations/hanoi.png',
     description: 'Thủ đô nghìn năm văn hiến với những di tích lịch sử',
-    highlights: ['Hồ Hoàn Kiếm', 'Phố Cổ'],
     weather: '25°C',
     region: 'Miền Bắc',
   },
@@ -24,7 +22,6 @@ const destinations = [
     name: 'Nghệ An',
     image: '/images/destinations/nghean.png',
     description: 'Vùng đất anh hùng với thiên nhiên hùng vĩ',
-    highlights: ['Phong Nha Kẻ Bàng', 'Biển Cửa Lò'],
     weather: '26°C',
     region: 'Miền Trung',
   },
@@ -33,7 +30,6 @@ const destinations = [
     name: 'Phú Quốc',
     image: '/images/destinations/phuquoc.png',
     description: 'Đảo ngọc với những bãi biển hoang sơ tuyệt đẹp',
-    highlights: ['Cáp treo Hòn Thơm', 'Bãi Sao'],
     weather: '29°C',
     region: 'Miền Nam',
   },
@@ -89,19 +85,6 @@ export default function PopularDestinations() {
                 <p className="text-gray-200 mb-3 text-sm line-clamp-2">
                   {destination.description}
                 </p>
-                
-                {/* Highlights */}
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {destination.highlights.map((highlight, index) => (
-                    <span
-                      key={index}
-                      className="bg-blue-500/80 text-white text-xs px-2 py-1 rounded-full"
-                    >
-                      {highlight}
-                    </span>
-                  ))}
-                </div>
-
                 {/* CTA */}
                 <div className="flex items-center justify-between">
                   <div className="text-blue-300 text-sm font-medium">
