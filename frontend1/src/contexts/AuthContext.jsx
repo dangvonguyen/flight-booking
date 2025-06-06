@@ -6,14 +6,6 @@ const AuthContext = createContext()
 const testUsers = [
   {
     id: 1,
-    email: 'admin@example.com',
-    password: '123456',
-    firstName: 'Admin',
-    lastName: 'User',
-    role: 'admin'
-  },
-  {
-    id: 2,
     email: 'user@example.com',
     password: '123456',
     firstName: 'Normal',

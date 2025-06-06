@@ -22,11 +22,7 @@ export default function Login() {
 
     try {
       const userData = await login(formData.email, formData.password)
-      if (userData.role === 'admin') {
-        navigate('/admin')
-      } else {
-        navigate('/')
-      }
+      navigate('/')
     } catch (err) {
       setError('Đăng nhập thất bại!')
     } finally {
@@ -42,12 +38,9 @@ export default function Login() {
     }))
   }
 
-  const handleTestLogin = (role) => {
-    const testAccounts = {
-      admin: { email: 'admin@example.com', password: '123456' },
-      user: { email: 'user@example.com', password: '123456' }
-    }
-    setFormData(testAccounts[role])
+  const handleTestLogin = () => {
+    const testAccount = { email: 'user@example.com', password: '123456' }
+    setFormData(testAccount)
   }
 
   return (
@@ -151,18 +144,13 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="mt-6">
                 <Button
                   variant="outline"
-                  onClick={() => handleTestLogin('admin')}
+                  onClick={() => handleTestLogin()}
+                  className="w-full"
                 >
-                  Đăng nhập Admin
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleTestLogin('user')}
-                >
-                  Đăng nhập User
+                  Đăng nhập User Test
                 </Button>
               </div>
             </div>
