@@ -2,6 +2,7 @@ import random
 import json
 from datetime import datetime, timedelta
 
+
 airports = [
     {"name": "Nội Bài", "iata": "HAN"},
     {"name": "Tân Sơn Nhất", "iata": "SGN"},
@@ -26,36 +27,33 @@ airports = [
 ]
 
 
-airlines = [
-    {"name": "Vietnam Airlines", "iata": "VN"},
-    {"name": "VietJet Air", "iata": "VJ"},
-    {"name": "Bamboo Airways", "iata": "QH"},
-    {"name": "Pacific Airlines", "iata": "BL"},
-]
+airlines = {
+    "VN": "Vietnam Airlines",
+    "VJ": "VietJet Air",
+    "QH": "Bamboo Airways",
+    "BL": "Pacific Airlines"
+}
+
 
 terminals = ["T1", "T2"]
 gates = [f"{chr(65+i)}{random.randint(1,20)}" for i in range(6)]
 
+
 start_date = datetime(2025, 7, 1)
-num_days = 60
-scheduled_departures = {}
+num_days = 150
+flights = []
 
 
-def create_flight(dep_airport, arr_airport, dep_time, allow_duplicate=False, forced_airline=None):
-    dep_key = (dep_airport["iata"], dep_time.strftime('%Y-%m-%dT%H:%M'))
-    if not allow_duplicate and dep_key in scheduled_departures:
-        return None
-    scheduled_departures[dep_key] = True
+def generate_flight_number(iata_code):
+    return f"{iata_code}{random.randint(100,999)}"
 
-    duration = random.randint(60, 150)
+
+def create_flight(dep_airport, arr_airport, dep_time, airline_code):
+    duration = random.randint(60, 150)  # phút
     arr_time = dep_time + timedelta(minutes=duration)
-    airline = forced_airline or random.choice(airlines)
-
-    flight_number = f"{airline['iata']}{random.randint(100,999)}{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}"
-
     return {
         "flight_date": dep_time.strftime("%Y-%m-%d"),
-        "flight_number": flight_number,
+        "flight_number": generate_flight_number(airline_code),
         "departure": {
             "airport": f"Sân bay {dep_airport['name']}",
             "iata": dep_airport["iata"],
@@ -70,40 +68,30 @@ def create_flight(dep_airport, arr_airport, dep_time, allow_duplicate=False, for
             "gate": random.choice(gates),
             "scheduled": arr_time.strftime("%Y-%m-%dT%H:%M:%S")
         },
-        "airline": airline,
+        "airline": {
+            "name": airlines[airline_code],
+            "iata": airline_code
+        },
         "price": random.randint(800_000, 2_500_000),
         "seats": random.randint(120, 220)
     }
 
 
-flights = []
+for day_offset in range(num_days):
+    current_date = start_date + timedelta(days=day_offset)
+    for dep_airport in airports:
+        arrivals = [a for a in airports if a != dep_airport]
+        for airline_code in ["VN", "VJ"]:
+            arr_airport = random.choice(arrivals)
+            hour = random.randint(6, 20)
+            minute = random.choice([0, 15, 30, 45])
+            dep_time = datetime(
+                current_date.year, current_date.month, current_date.day, hour, minute
+            )
+            flight = create_flight(dep_airport, arr_airport, dep_time, airline_code)
+            flights.append(flight)
 
 
-for i in range(3):
-    dep = random.choice(airports)
-    arr1, arr2 = random.sample([a for a in airports if a != dep], 2)
-    day = random.randint(0, num_days - 1)
-    hour = random.randint(6, 20)
-    minute = random.choice([0, 15, 30, 45])
-    dep_time = start_date + timedelta(days=day, hours=hour, minutes=minute)
-    airline = random.choice(airlines)
-    f1 = create_flight(dep, arr1, dep_time, allow_duplicate=True, forced_airline=airline)
-    f2 = create_flight(dep, arr2, dep_time, allow_duplicate=True, forced_airline=airline)
-    if f1 and f2:
-        flights.extend([f1, f2])
+with open("vietnam_flights_2025.json", "w", encoding="utf-8") as f:
+    json.dump(flights, f, ensure_ascii=False, indent=2)
 
-
-while len(flights) < 100:
-    dep, arr = random.sample(airports, 2)
-    day = random.randint(0, num_days - 1)
-    hour = random.randint(5, 22)
-    minute = random.choice([0, 15, 30, 45])
-    dep_time = start_date + timedelta(days=day, hours=hour, minutes=minute)
-    airline = random.choice(airlines)
-    flight = create_flight(dep, arr, dep_time, forced_airline=airline)
-    if flight:
-        flights.append(flight)
-
-
-with open("flights_vietnam_2025.json", "w", encoding="utf-8") as f:
-    json.dump(flights, f, indent=2, ensure_ascii=False)
