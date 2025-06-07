@@ -189,6 +189,7 @@ export default function DestinationDetail() {
   const navigate = useNavigate()
   const destination = destinationsData[id]
   const [activeTab, setActiveTab] = useState('overview')
+  const [selectedImage, setSelectedImage] = useState(null)
 
   if (!destination) {
     return (
@@ -335,7 +336,7 @@ export default function DestinationDetail() {
                   <h2 className="text-xl font-bold text-gray-900 mb-4">Thư viện ảnh</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {destination.gallery.map((image, index) => (
-                      <div key={index} className="relative group overflow-hidden rounded-lg">
+                      <div key={index} className="relative group overflow-hidden rounded-lg cursor-pointer" onClick={() => setSelectedImage(image)}>
                         <img
                           src={image}
                           alt={`${destination.name} ${index + 1}`}
@@ -345,6 +346,21 @@ export default function DestinationDetail() {
                       </div>
                     ))}
                   </div>
+                  {selectedImage && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setSelectedImage(null)}>
+                      <div className="relative" onClick={e => e.stopPropagation()}>
+                        <img src={selectedImage} alt="Phóng to" className="max-w-[90vw] max-h-[80vh] rounded-xl shadow-2xl" />
+                        <button
+                          className="absolute top-2 right-2 bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow"
+                          onClick={() => setSelectedImage(null)}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
