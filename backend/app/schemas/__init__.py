@@ -1,3 +1,10 @@
+from .booking import (
+    BookingBase,
+    BookingCreate,
+    BookingPublic,
+    BookingsPublic,
+    BookingUpdate,
+)
 from .flight import (
     FlightBase,
     FlightCreate,
@@ -5,6 +12,27 @@ from .flight import (
     FlightSearch,
     FlightsPublic,
     FlightUpdate,
+)
+from .passenger import (
+    PassengerBase,
+    PassengerCreate,
+    PassengerPublic,
+    PassengersPublic,
+    PassengerUpdate,
+)
+from .seat import (
+    SeatBase,
+    SeatCreate,
+    SeatPublic,
+    SeatsPublic,
+    SeatUpdate,
+)
+from .ticket import (
+    TicketBase,
+    TicketCreate,
+    TicketPublic,
+    TicketsPublic,
+    TicketUpdate,
 )
 from .user import (
     BaseUser,
