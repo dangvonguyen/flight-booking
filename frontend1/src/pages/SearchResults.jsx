@@ -2,7 +2,227 @@ import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
-import aviationStackService from '../services/aviationStackService'
+import flightService from '../services/flightService'
+
+// Mock data for testing UI/UX
+const MOCK_FLIGHTS_DATA = [
+  {
+    flight: { iataNumber: 'VN210' },
+    airline: { iataCode: 'VN', name: 'Vietnam Airlines' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T06:30:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T08:45:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1450000, business: 3200000 },
+    aircraft: { modelCode: 'A321' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'VJ125' },
+    airline: { iataCode: 'VJ', name: 'VietJet Air' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T07:15:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T09:30:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1250000, business: 2800000 },
+    aircraft: { modelCode: 'A320' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'QH208' },
+    airline: { iataCode: 'QH', name: 'Bamboo Airways' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T08:00:00Z',
+      terminal: 'T2'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T10:15:00Z',
+      terminal: 'T1'
+    },
+    duration: '2h 15m',
+    price: { economy: 1380000, business: 3100000 },
+    aircraft: { modelCode: 'A321neo' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'BL345' },
+    airline: { iataCode: 'BL', name: 'Pacific Airlines' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T09:30:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T11:45:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1320000, business: 2950000 },
+    aircraft: { modelCode: 'A320' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'VN215' },
+    airline: { iataCode: 'VN', name: 'Vietnam Airlines' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T11:00:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T13:15:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1520000, business: 3350000 },
+    aircraft: { modelCode: 'A350' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'VJ130' },
+    airline: { iataCode: 'VJ', name: 'VietJet Air' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T12:45:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T15:00:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1180000, business: 2650000 },
+    aircraft: { modelCode: 'A321' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'QH212' },
+    airline: { iataCode: 'QH', name: 'Bamboo Airways' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T14:30:00Z',
+      terminal: 'T2'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T16:45:00Z',
+      terminal: 'T1'
+    },
+    duration: '2h 15m',
+    price: { economy: 1420000, business: 3180000 },
+    aircraft: { modelCode: 'A321neo' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'VN220' },
+    airline: { iataCode: 'VN', name: 'Vietnam Airlines' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T16:15:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T18:30:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1680000, business: 3680000 },
+    aircraft: { modelCode: 'A350' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'BL350' },
+    airline: { iataCode: 'BL', name: 'Pacific Airlines' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T18:00:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T20:15:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1290000, business: 2890000 },
+    aircraft: { modelCode: 'A320' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'VJ140' },
+    airline: { iataCode: 'VJ', name: 'VietJet Air' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T19:45:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T22:00:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1350000, business: 2750000 },
+    aircraft: { modelCode: 'A321' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'QH216' },
+    airline: { iataCode: 'QH', name: 'Bamboo Airways' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T21:30:00Z',
+      terminal: 'T2'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-20T23:45:00Z',
+      terminal: 'T1'
+    },
+    duration: '2h 15m',
+    price: { economy: 1480000, business: 3280000 },
+    aircraft: { modelCode: 'A321neo' },
+    status: 'scheduled'
+  },
+  {
+    flight: { iataNumber: 'VN225' },
+    airline: { iataCode: 'VN', name: 'Vietnam Airlines' },
+    departure: { 
+      iataCode: 'SGN', 
+      scheduledTime: '2024-12-20T22:15:00Z',
+      terminal: 'T1'
+    },
+    arrival: { 
+      iataCode: 'HAN', 
+      scheduledTime: '2024-12-21T00:30:00Z',
+      terminal: 'T2'
+    },
+    duration: '2h 15m',
+    price: { economy: 1550000, business: 3450000 },
+    aircraft: { modelCode: 'A350' },
+    status: 'scheduled'
+  }
+]
 
 // Add custom CSS for slider
 const sliderStyles = `
@@ -50,7 +270,15 @@ export default function SearchResults() {
     priceRange: [0, 10000000],
     airlines: [],
     departureTime: [],
+    arrivalTime: [],
     stops: 'all'
+  })
+
+  // Expand/Collapse states for filters
+  const [expandedFilters, setExpandedFilters] = useState({
+    price: true,
+    airlines: true,
+    flightTime: true
   })
 
   // Sort state
@@ -65,18 +293,28 @@ export default function SearchResults() {
 
       try {
         setLoading(true)
-        const response = await aviationStackService.getFlightSchedules({
-          dep_iata: searchParams.from,
-          arr_iata: searchParams.to,
-          flight_date: searchParams.departureDate,
+        
+        // Uncomment dòng dưới để sử dụng mock data cho test UI/UX
+        // setFlights(MOCK_FLIGHTS_DATA)
+        // setFilteredFlights(MOCK_FLIGHTS_DATA)
+        // setLoading(false)
+        // return
+        
+        // Sử dụng flightService để gọi backend API
+        const response = await flightService.searchFlights({
+          from: searchParams.from,
+          to: searchParams.to,
+          departureDate: searchParams.departureDate,
           limit: 50
         })
         
         setFlights(response.data || [])
         setFilteredFlights(response.data || [])
       } catch (err) {
-        setError('Có lỗi xảy ra khi tìm kiếm chuyến bay')
-        console.error('Error searching flights:', err)
+        // Nếu backend API không hoạt động, fallback về mock data
+        console.warn('Backend API không khả dụng, sử dụng mock data:', err)
+        setFlights(MOCK_FLIGHTS_DATA)
+        setFilteredFlights(MOCK_FLIGHTS_DATA)
       } finally {
         setLoading(false)
       }
@@ -108,10 +346,26 @@ export default function SearchResults() {
         const hour = new Date(flight.departure.scheduledTime).getHours()
         return filters.departureTime.some(timeRange => {
           switch(timeRange) {
+            case 'early-morning': return hour >= 0 && hour < 6
             case 'morning': return hour >= 6 && hour < 12
             case 'afternoon': return hour >= 12 && hour < 18
             case 'evening': return hour >= 18 && hour < 24
-            case 'night': return hour >= 0 && hour < 6
+            default: return true
+          }
+        })
+      })
+    }
+
+    // Filter by arrival time
+    if (filters.arrivalTime.length > 0) {
+      filtered = filtered.filter(flight => {
+        const hour = new Date(flight.arrival.scheduledTime).getHours()
+        return filters.arrivalTime.some(timeRange => {
+          switch(timeRange) {
+            case 'early-morning': return hour >= 0 && hour < 6
+            case 'morning': return hour >= 6 && hour < 12
+            case 'afternoon': return hour >= 12 && hour < 18
+            case 'evening': return hour >= 18 && hour < 24
             default: return true
           }
         })
@@ -169,15 +423,25 @@ export default function SearchResults() {
       'VN': '/images/airlines/vietnam-airlines.png',
       'VJ': '/images/airlines/vietjet.png',
       'QH': '/images/airlines/bamboo-airways.png',
-      'BL': '/images/airlines/jetstar.png'
+      'BL': '/images/airlines/pacific-airlines.png'
     }
     return logos[iataCode] || '/images/airlines/default.png'
   }
 
   const getUniqueAirlines = () => {
+    if (!flights || flights.length === 0) {
+      // Return default airlines if no flights data
+      return [
+        { code: 'VN', name: 'Vietnam Airlines' },
+        { code: 'VJ', name: 'VietJet Air' },
+        { code: 'QH', name: 'Bamboo Airways' },
+        { code: 'BL', name: 'Pacific Airlines' }
+      ]
+    }
+    
     const airlines = flights.map(flight => ({
-      code: flight.airline.iataCode,
-      name: flight.airline.name
+      code: flight.airline?.iataCode || flight.airline?.iata || 'VN',
+      name: flight.airline?.name || 'Vietnam Airlines'
     }))
     return airlines.filter((airline, index, self) => 
       index === self.findIndex(a => a.code === airline.code)
@@ -196,8 +460,16 @@ export default function SearchResults() {
       priceRange: [0, 10000000],
       airlines: [],
       departureTime: [],
+      arrivalTime: [],
       stops: 'all'
     })
+  }
+
+  const toggleFilterExpansion = (filterType) => {
+    setExpandedFilters(prev => ({
+      ...prev,
+      [filterType]: !prev[filterType]
+    }))
   }
 
   const handleSelectFlight = (flight) => {
@@ -308,80 +580,219 @@ export default function SearchResults() {
 
               {/* Price Range Filter */}
               <div className="mb-6">
-                <h3 className="font-medium text-gray-900 mb-3">Khoảng giá</h3>
-                <div className="space-y-2">
-                                     <input
-                     type="range"
-                     min="0"
-                     max="10000000"
-                     step="100000"
-                     value={filters.priceRange[1]}
-                     onChange={(e) => handleFilterChange('priceRange', [0, parseInt(e.target.value)])}
-                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                     style={{
-                       background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(filters.priceRange[1] / 10000000) * 100}%, #e5e7eb ${(filters.priceRange[1] / 10000000) * 100}%, #e5e7eb 100%)`
-                     }}
-                   />
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>0đ</span>
-                    <span>{filters.priceRange[1].toLocaleString('vi-VN')}đ</span>
+                <button
+                  onClick={() => toggleFilterExpansion('price')}
+                  className="w-full bg-white flex items-center justify-between py-2 text-left"
+                >
+                  <h3 className="font-medium text-gray-600">Khoảng giá</h3>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                      expandedFilters.price ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {expandedFilters.price && (
+                  <div className="space-y-2 mt-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="10000000"
+                      step="100000"
+                      value={filters.priceRange[1]}
+                      onChange={(e) => handleFilterChange('priceRange', [0, parseInt(e.target.value)])}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(filters.priceRange[1] / 10000000) * 100}%, #e5e7eb ${(filters.priceRange[1] / 10000000) * 100}%, #e5e7eb 100%)`
+                      }}
+                    />
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>0đ</span>
+                      <span>{filters.priceRange[1].toLocaleString('vi-VN')}đ</span>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Airlines Filter */}
               <div className="mb-6">
-                <h3 className="font-medium text-gray-900 mb-3">Hãng hàng không</h3>
-                <div className="space-y-2">
-                  {getUniqueAirlines().map(airline => (
-                    <label key={airline.code} className="flex items-center">
-                                             <input
-                         type="checkbox"
-                         checked={filters.airlines.includes(airline.code)}
-                         onChange={(e) => {
-                           if (e.target.checked) {
-                             handleFilterChange('airlines', [...filters.airlines, airline.code])
-                           } else {
-                             handleFilterChange('airlines', filters.airlines.filter(a => a !== airline.code))
-                           }
-                         }}
-                         className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
-                       />
-                      <span className="ml-2 text-sm text-gray-700">{airline.name}</span>
-                    </label>
-                  ))}
-                </div>
+                <button
+                  onClick={() => toggleFilterExpansion('airlines')}
+                  className="w-full bg-white flex items-center justify-between py-2 text-left"
+                >
+                  <h3 className="font-medium text-gray-600">Hãng hàng không</h3>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                      expandedFilters.airlines ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {expandedFilters.airlines && (
+                  <div className="space-y-2 mt-3">
+                  {getUniqueAirlines().length > 0 ? (
+                    getUniqueAirlines().map(airline => (
+                      <button
+                        key={airline.code}
+                        onClick={() => {
+                          if (filters.airlines.includes(airline.code)) {
+                            handleFilterChange('airlines', filters.airlines.filter(a => a !== airline.code))
+                          } else {
+                            handleFilterChange('airlines', [...filters.airlines, airline.code])
+                          }
+                        }}
+                        className={`w-full p-3 rounded-lg border text-left transition-all duration-200 flex items-center gap-3 ${
+                          filters.airlines.includes(airline.code)
+                            ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 shadow-sm'
+                        }`}
+                        style={{ backgroundColor: filters.airlines.includes(airline.code) ? '#eff6ff' : '#ffffff' }}
+                      >
+                        <img
+                          src={getAirlineLogo(airline.code)}
+                          alt={airline.name}
+                          className="h-8 w-8 object-contain"
+                          onError={(e) => {
+                            e.target.src = '/images/airlines/default.png'
+                          }}
+                        />
+                        <div className="flex-1">
+                          <div className={`font-medium ${filters.airlines.includes(airline.code) ? 'text-blue-700' : 'text-gray-800'}`}>
+                            {airline.name}
+                          </div>
+                          <div className={`text-xs ${filters.airlines.includes(airline.code) ? 'text-blue-500' : 'text-gray-500'}`}>
+                            {airline.code}
+                          </div>
+                        </div>
+                        {filters.airlines.includes(airline.code) && (
+                          <div className="text-blue-600">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg">
+                      Không có hãng hàng không nào
+                    </div>
+                  )}
+                  </div>
+                )}
               </div>
 
-              {/* Departure Time Filter */}
+              {/* Flight Time Filter */}
               <div className="mb-6">
-                <h3 className="font-medium text-gray-900 mb-3">Giờ khởi hành</h3>
-                <div className="space-y-2">
-                  {[
-                    { value: 'morning', label: 'Sáng (06:00 - 12:00)', icon: '🌅' },
-                    { value: 'afternoon', label: 'Chiều (12:00 - 18:00)', icon: '☀️' },
-                    { value: 'evening', label: 'Tối (18:00 - 24:00)', icon: '🌆' },
-                    { value: 'night', label: 'Đêm (00:00 - 06:00)', icon: '🌙' }
-                  ].map(time => (
-                    <label key={time.value} className="flex items-center">
-                      <input
-                                                 type="checkbox"
-                         checked={filters.departureTime.includes(time.value)}
-                         onChange={(e) => {
-                           if (e.target.checked) {
-                             handleFilterChange('departureTime', [...filters.departureTime, time.value])
-                           } else {
-                             handleFilterChange('departureTime', filters.departureTime.filter(t => t !== time.value))
-                           }
-                         }}
-                         className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">
-                        {time.icon} {time.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
+                <button
+                  onClick={() => toggleFilterExpansion('flightTime')}
+                  className="w-full bg-white flex items-center justify-between py-2 text-left"
+                >
+                  <h3 className="font-medium text-gray-600">Thời gian bay</h3>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                      expandedFilters.flightTime ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {expandedFilters.flightTime && (
+                  <div className="space-y-4 mt-3">
+                    {/* Departure Time */}
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Giờ cất cánh</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: 'early-morning', label: 'Đêm đến Sáng', time: '00:00 - 06:00' },
+                          { value: 'morning', label: 'Sáng đến Trưa', time: '06:00 - 12:00' },
+                          { value: 'afternoon', label: 'Trưa đến tối', time: '12:00 - 18:00' },
+                          { value: 'evening', label: 'Tối đến Đêm', time: '18:00 - 24:00' }
+                        ].map(time => (
+                          <button
+                            key={`dep-${time.value}`}
+                            onClick={() => {
+                              if (filters.departureTime.includes(time.value)) {
+                                handleFilterChange('departureTime', filters.departureTime.filter(t => t !== time.value))
+                              } else {
+                                handleFilterChange('departureTime', [...filters.departureTime, time.value])
+                              }
+                            }}
+                            className={`p-3 rounded-lg border text-center transition-all duration-200 shadow-sm ${
+                              filters.departureTime.includes(time.value)
+                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700'
+                            }`}
+                            style={{ backgroundColor: filters.departureTime.includes(time.value) ? '#eff6ff' : '#ffffff' }}
+                          >
+                            <div className={`text-xs font-medium mb-1 ${
+                              filters.departureTime.includes(time.value) ? 'text-blue-600' : 'text-gray-600'
+                            }`}>
+                              {time.label}
+                            </div>
+                            <div className={`text-sm font-semibold ${
+                              filters.departureTime.includes(time.value) ? 'text-blue-700' : 'text-blue-600'
+                            }`}>
+                              {time.time}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Arrival Time */}
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Giờ hạ cánh</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: 'early-morning', label: 'Đêm đến Sáng', time: '00:00 - 06:00' },
+                          { value: 'morning', label: 'Sáng đến Trưa', time: '06:00 - 12:00' },
+                          { value: 'afternoon', label: 'Trưa đến tối', time: '12:00 - 18:00' },
+                          { value: 'evening', label: 'Tối đến Đêm', time: '18:00 - 24:00' }
+                        ].map(time => (
+                          <button
+                            key={`arr-${time.value}`}
+                            onClick={() => {
+                              if (filters.arrivalTime.includes(time.value)) {
+                                handleFilterChange('arrivalTime', filters.arrivalTime.filter(t => t !== time.value))
+                              } else {
+                                handleFilterChange('arrivalTime', [...filters.arrivalTime, time.value])
+                              }
+                            }}
+                            className={`p-3 rounded-lg border text-center transition-all duration-200 shadow-sm ${
+                              filters.arrivalTime.includes(time.value)
+                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700'
+                            }`}
+                            style={{ backgroundColor: filters.arrivalTime.includes(time.value) ? '#eff6ff' : '#ffffff' }}
+                          >
+                            <div className={`text-xs font-medium mb-1 ${
+                              filters.arrivalTime.includes(time.value) ? 'text-blue-600' : 'text-gray-600'
+                            }`}>
+                              {time.label}
+                            </div>
+                            <div className={`text-sm font-semibold ${
+                              filters.arrivalTime.includes(time.value) ? 'text-blue-700' : 'text-blue-600'
+                            }`}>
+                              {time.time}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

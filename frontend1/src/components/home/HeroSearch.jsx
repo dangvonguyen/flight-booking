@@ -29,15 +29,46 @@ export default function HeroSearch() {
   const [recentSearches] = useState([
     { iata_code: 'HAN', airport_name: 'Sân bay Nội Bài', city_name: 'Hà Nội' },
     { iata_code: 'SGN', airport_name: 'Sân bay Tân Sơn Nhất', city_name: 'TP. Hồ Chí Minh' },
-    { iata_code: 'DAD', airport_name: 'Sân bay Đà Nẵng', city_name: 'Đà Nẵng' }
+    { iata_code: 'DAD', airport_name: 'Sân bay Đà Nẵng', city_name: 'Đà Nẵng' },
+    { iata_code: 'CXR', airport_name: 'Sân bay Cam Ranh', city_name: 'Nha Trang' },
+    { iata_code: 'PQC', airport_name: 'Sân bay Phú Quốc', city_name: 'Phú Quốc' },
+    { iata_code: 'VCA', airport_name: 'Sân bay Cần Thơ', city_name: 'Cần Thơ' },
+    { iata_code: 'VII', airport_name: 'Sân bay Vinh', city_name: 'Vinh' },
+    { iata_code: 'HUI', airport_name: 'Sân bay Huế', city_name: 'Huế' },
+    { iata_code: 'VCL', airport_name: 'Sân bay Chu Lai', city_name: 'Chu Lai' },
+    { iata_code: 'BMV', airport_name: 'Sân bay Buôn Ma Thuột', city_name: 'Buôn Ma Thuột' },
+    { iata_code: 'DLI', airport_name: 'Sân bay Liên Khương', city_name: 'Đà Lạt' },
+    { iata_code: 'VKG', airport_name: 'Sân bay Rạch Giá', city_name: 'Rạch Giá' },
+    { iata_code: 'TBB', airport_name: 'Sân bay Tuy Hòa', city_name: 'Tuy Hòa' },
+    { iata_code: 'VDH', airport_name: 'Sân bay Đồng Hới', city_name: 'Đồng Hới' },
+    { iata_code: 'PXU', airport_name: 'Sân bay Pleiku', city_name: 'Pleiku' },
+    { iata_code: 'CAH', airport_name: 'Sân bay Cà Mau', city_name: 'Cà Mau' },
+    { iata_code: 'DIN', airport_name: 'Sân bay Điện Biên', city_name: 'Điện Biên' },
+    { iata_code: 'NHA', airport_name: 'Sân bay Nha Trang', city_name: 'Nha Trang' },
+    { iata_code: 'THD', airport_name: 'Sân bay Thọ Xuân', city_name: 'Thanh Hóa' },
+    { iata_code: 'XCL', airport_name: 'Sân bay Kiên Lương', city_name: 'Kiên Lương' }
   ])
   const [popularDestinations] = useState([
+    { iata_code: 'HAN', airport_name: 'Sân bay Nội Bài', city_name: 'Hà Nội', country_name: 'Việt Nam', isHot: true },
+    { iata_code: 'SGN', airport_name: 'Sân bay Tân Sơn Nhất', city_name: 'TP. Hồ Chí Minh', country_name: 'Việt Nam', isHot: true },
+    { iata_code: 'DAD', airport_name: 'Sân bay Đà Nẵng', city_name: 'Đà Nẵng', country_name: 'Việt Nam', isHot: true },
     { iata_code: 'PQC', airport_name: 'Sân bay Phú Quốc', city_name: 'Phú Quốc', country_name: 'Việt Nam', isHot: true },
+    { iata_code: 'CXR', airport_name: 'Sân bay Cam Ranh', city_name: 'Nha Trang', country_name: 'Việt Nam', isHot: true },
+    { iata_code: 'VCA', airport_name: 'Sân bay Cần Thơ', city_name: 'Cần Thơ', country_name: 'Việt Nam' },
     { iata_code: 'VII', airport_name: 'Sân bay Vinh', city_name: 'Vinh', country_name: 'Việt Nam' },
-    { iata_code: 'BKK', airport_name: 'Suvarnabhumi Airport', city_name: 'Bangkok', country_name: 'Thái Lan', isHot: true },
-    { iata_code: 'SIN', airport_name: 'Changi Airport', city_name: 'Singapore', country_name: 'Singapore', isHot: true },
-    { iata_code: 'KUL', airport_name: 'Kuala Lumpur International', city_name: 'Kuala Lumpur', country_name: 'Malaysia' },
-    { iata_code: 'CXR', airport_name: 'Sân bay Cam Ranh', city_name: 'Nha Trang', country_name: 'Việt Nam' }
+    { iata_code: 'HUI', airport_name: 'Sân bay Huế', city_name: 'Huế', country_name: 'Việt Nam' },
+    { iata_code: 'VCL', airport_name: 'Sân bay Chu Lai', city_name: 'Chu Lai', country_name: 'Việt Nam' },
+    { iata_code: 'BMV', airport_name: 'Sân bay Buôn Ma Thuột', city_name: 'Buôn Ma Thuột', country_name: 'Việt Nam' },
+    { iata_code: 'DLI', airport_name: 'Sân bay Liên Khương', city_name: 'Đà Lạt', country_name: 'Việt Nam' },
+    { iata_code: 'VKG', airport_name: 'Sân bay Rạch Giá', city_name: 'Rạch Giá', country_name: 'Việt Nam' },
+    { iata_code: 'TBB', airport_name: 'Sân bay Tuy Hòa', city_name: 'Tuy Hòa', country_name: 'Việt Nam' },
+    { iata_code: 'VDH', airport_name: 'Sân bay Đồng Hới', city_name: 'Đồng Hới', country_name: 'Việt Nam' },
+    { iata_code: 'PXU', airport_name: 'Sân bay Pleiku', city_name: 'Pleiku', country_name: 'Việt Nam' },
+    { iata_code: 'CAH', airport_name: 'Sân bay Cà Mau', city_name: 'Cà Mau', country_name: 'Việt Nam' },
+    { iata_code: 'DIN', airport_name: 'Sân bay Điện Biên', city_name: 'Điện Biên', country_name: 'Việt Nam' },
+    { iata_code: 'NHA', airport_name: 'Sân bay Nha Trang', city_name: 'Nha Trang', country_name: 'Việt Nam' },
+    { iata_code: 'THD', airport_name: 'Sân bay Thọ Xuân', city_name: 'Thanh Hóa', country_name: 'Việt Nam' },
+    { iata_code: 'XCL', airport_name: 'Sân bay Kiên Lương', city_name: 'Kiên Lương', country_name: 'Việt Nam' }
   ])
 
   useEffect(() => {

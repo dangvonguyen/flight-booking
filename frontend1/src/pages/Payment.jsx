@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -36,6 +36,89 @@ export default function Payment() {
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Countdown timer states - 40 phút = 2400 giây
+  const [timeLeft, setTimeLeft] = useState(40 * 60) // 2400 seconds
+  const [isExpired, setIsExpired] = useState(false)
+  const [showWarning, setShowWarning] = useState(false)
+
+  // Countdown timer effect
+  useEffect(() => {
+    // Lưu thời gian bắt đầu vào localStorage
+    const startTime = localStorage.getItem('paymentStartTime')
+    const bookingData = {
+      flightDetails,
+      passengerInfo,
+      selectedSeat,
+      searchParams,
+      departureAirport,
+      arrivalAirport,
+      status: 'pending_payment',
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 40 * 60 * 1000).toISOString()
+    }
+
+    if (!startTime) {
+      const now = Date.now()
+      localStorage.setItem('paymentStartTime', now.toString())
+      // Lưu booking data vào localStorage với trạng thái chờ thanh toán
+      const bookingHistory = JSON.parse(localStorage.getItem('bookingHistory') || '[]')
+      const bookingId = `BK${Date.now().toString().slice(-8)}`
+      bookingHistory.push({
+        ...bookingData,
+        id: bookingId,
+        status: 'pending_payment'
+      })
+      localStorage.setItem('bookingHistory', JSON.stringify(bookingHistory))
+      localStorage.setItem('currentBookingId', bookingId)
+    }
+
+    const timer = setInterval(() => {
+      const startTimeStamp = parseInt(localStorage.getItem('paymentStartTime') || Date.now().toString())
+      const elapsed = Math.floor((Date.now() - startTimeStamp) / 1000)
+      const remaining = Math.max(0, 2400 - elapsed) // 40 minutes = 2400 seconds
+
+      setTimeLeft(remaining)
+
+      // Hiển thị cảnh báo khi còn 5 phút
+      if (remaining <= 300 && remaining > 0) {
+        setShowWarning(true)
+      }
+
+      // Khi hết thời gian
+      if (remaining === 0) {
+        setIsExpired(true)
+        setShowWarning(false)
+        
+        // Cập nhật trạng thái thành đã hủy trong localStorage
+        const bookingHistory = JSON.parse(localStorage.getItem('bookingHistory') || '[]')
+        const currentBookingId = localStorage.getItem('currentBookingId')
+        const updatedHistory = bookingHistory.map(booking => 
+          booking.id === currentBookingId 
+            ? { ...booking, status: 'cancelled', cancelledAt: new Date().toISOString() }
+            : booking
+        )
+        localStorage.setItem('bookingHistory', JSON.stringify(updatedHistory))
+        
+        // Clear payment session
+        localStorage.removeItem('paymentStartTime')
+        localStorage.removeItem('currentBookingId')
+        
+        clearInterval(timer)
+      }
+    }, 1000)
+
+    return () => {
+      clearInterval(timer)
+    }
+  }, [flightDetails, passengerInfo, selectedSeat, searchParams, departureAirport, arrivalAirport])
+
+  // Format time display
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
+
   // Removed validation since we're using mock data for testing
 
   // Tính toán giá
@@ -72,6 +155,13 @@ export default function Payment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    if (isExpired) {
+      alert('Phiên thanh toán đã hết hạn. Vui lòng đặt vé lại.')
+      navigate('/')
+      return
+    }
+
     if (validateCardInfo()) {
       setIsSubmitting(true)
       
@@ -79,7 +169,11 @@ export default function Payment() {
       await new Promise(resolve => setTimeout(resolve, 1500))
       
       // Tạo booking ID
-      const bookingId = `BK${Date.now().toString().slice(-8)}`
+      const bookingId = localStorage.getItem('currentBookingId') || `BK${Date.now().toString().slice(-8)}`
+      
+      // Clear payment session
+      localStorage.removeItem('paymentStartTime')
+      localStorage.removeItem('currentBookingId')
       
       navigate('/payment-process', {
         state: {
@@ -115,22 +209,115 @@ export default function Payment() {
     setCardInfo({ ...cardInfo, expiry: value })
   }
 
+  // Handle expired session
+  if (isExpired) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 py-8 flex items-center justify-center">
+        <div className="container mx-auto px-4">
+          <div className="max-w-md mx-auto">
+            <Card className="shadow-2xl border-0 overflow-hidden">
+              <Card.Body className="text-center p-8">
+                <div className="text-6xl mb-6">⏰</div>
+                <h2 className="text-2xl font-bold text-red-600 mb-4">
+                  Phiên thanh toán đã hết hạn
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Thời gian giữ vé đã hết. Vé của bạn đã được hủy và ghế đã được giải phóng.
+                </p>
+                <div className="space-y-4">
+                  <Button 
+                    onClick={() => navigate('/')}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    Đặt vé mới
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => navigate('/booking-history')}
+                    className="w-full"
+                  >
+                    Xem lịch sử đặt vé
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-8 animate-fadeIn">
-            Thanh toán
-          </h1>
+          {/* Countdown Timer Header */}
+          <div className="mb-8">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">Thanh toán</h1>
+              
+              {/* Countdown Display */}
+              <div className={`inline-flex items-center gap-4 px-6 py-4 rounded-2xl shadow-lg transition-all duration-300 ${
+                showWarning 
+                  ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse' 
+                  : timeLeft <= 600 
+                    ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white'
+                    : 'bg-gradient-to-r from-green-500 to-teal-500 text-white'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl">
+                    {showWarning ? '⚠️' : timeLeft <= 600 ? '⏳' : '⏱️'}
+                  </div>
+                  <div>
+                    <div className="text-sm opacity-90">
+                      {showWarning ? 'SẮP HẾT HạN!' : 'Thời gian còn lại'}
+                    </div>
+                    <div className="text-3xl font-bold font-mono">
+                      {formatTime(timeLeft)}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-sm opacity-90 text-center">
+                  <div>Vui lòng hoàn tất thanh toán</div>
+                  <div>trước khi hết thời gian</div>
+                </div>
+              </div>
+
+              {/* Warning message */}
+              {showWarning && (
+                <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg animate-bounce">
+                  <p className="text-red-700 font-semibold">
+                    🚨 Chỉ còn dưới 5 phút! Vé sẽ tự động hủy nếu không thanh toán kịp thời.
+                  </p>
+                </div>
+              )}
+
+              {/* Progress bar */}
+              <div className="mt-4 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-1000 ${
+                    showWarning 
+                      ? 'bg-gradient-to-r from-red-500 to-orange-500' 
+                      : timeLeft <= 600
+                        ? 'bg-gradient-to-r from-yellow-400 to-orange-400'
+                        : 'bg-gradient-to-r from-green-500 to-teal-500'
+                  }`}
+                  style={{ width: `${(timeLeft / 2400) * 100}%` }}
+                />
+              </div>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Thông tin đơn hàng */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Thông tin chuyến bay */}
-                <Card className="animate-slideUp">
-                  <Card.Header>
-                    <h2 className="text-lg font-medium">Thông tin chuyến bay</h2>
+                <Card className="animate-slideUp shadow-lg">
+                  <Card.Header className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                    <h2 className="text-lg font-bold flex items-center gap-2">
+                      ✈️ Thông tin chuyến bay
+                    </h2>
                   </Card.Header>
                   <Card.Body>
                     <div className="space-y-4">
@@ -172,25 +359,27 @@ export default function Payment() {
                 </Card>
 
                 {/* Thông tin hành khách */}
-                <Card className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
-                  <Card.Header>
-                    <h2 className="text-lg font-medium">Thông tin hành khách</h2>
+                <Card className="animate-slideUp shadow-lg" style={{ animationDelay: '0.1s' }}>
+                  <Card.Header className="bg-gradient-to-r from-green-600 to-teal-600 text-white">
+                    <h2 className="text-lg font-bold flex items-center gap-2">
+                      👤 Thông tin hành khách
+                    </h2>
                   </Card.Header>
                   <Card.Body>
                     <div className="space-y-4">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Họ tên</span>
                         <span className="font-medium">
-                          {passengerInfo.lastName} {passengerInfo.firstName}
+                          {passengerInfo.lastName || passengerInfo.last_name} {passengerInfo.firstName || passengerInfo.first_name}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Email</span>
-                        <span className="font-medium">{passengerInfo.email}</span>
+                        <span className="text-gray-600">Quốc tịch</span>
+                        <span className="font-medium">{passengerInfo.nationality}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Điện thoại</span>
-                        <span className="font-medium">{passengerInfo.phone}</span>
+                        <span className="text-gray-600">Số giấy tờ</span>
+                        <span className="font-medium">{passengerInfo.passport_number || passengerInfo.passportNumber}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Ghế ngồi</span>
@@ -203,10 +392,10 @@ export default function Payment() {
                 </Card>
 
                 {/* Phương thức thanh toán */}
-                <Card className="animate-slideUp" style={{ animationDelay: '0.2s' }}>
-                  <Card.Header>
-                    <h2 className="text-lg font-medium">
-                      Phương thức thanh toán
+                <Card className="animate-slideUp shadow-lg" style={{ animationDelay: '0.2s' }}>
+                  <Card.Header className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                    <h2 className="text-lg font-bold flex items-center gap-2">
+                      💳 Phương thức thanh toán
                     </h2>
                   </Card.Header>
                   <Card.Body>
@@ -318,9 +507,11 @@ export default function Payment() {
 
               {/* Tóm tắt giá */}
               <div className="lg:col-span-1">
-                <Card className="sticky top-8 animate-slideUp" style={{ animationDelay: '0.3s' }}>
-                  <Card.Header>
-                    <h2 className="text-lg font-medium">Tóm tắt đơn hàng</h2>
+                <Card className="sticky top-8 animate-slideUp shadow-lg" style={{ animationDelay: '0.3s' }}>
+                  <Card.Header className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                    <h2 className="text-lg font-bold flex items-center gap-2">
+                      💰 Tóm tắt đơn hàng
+                    </h2>
                   </Card.Header>
                   <Card.Body>
                     <div className="space-y-4">
@@ -362,14 +553,21 @@ export default function Payment() {
                       className={`w-full transition-all duration-300 ${
                         isSubmitting 
                           ? 'bg-gray-400 cursor-not-allowed' 
-                          : 'hover:scale-105 hover:shadow-lg'
+                          : showWarning
+                            ? 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 animate-pulse'
+                            : 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 hover:scale-105 hover:shadow-lg'
                       }`}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isExpired}
                     >
                       {isSubmitting ? (
                         <div className="flex items-center justify-center">
                           <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
                           Đang xử lý...
+                        </div>
+                      ) : showWarning ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <span>⚡</span>
+                          Thanh toán ngay!
                         </div>
                       ) : (
                         'Tiến hành thanh toán'

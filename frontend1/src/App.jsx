@@ -18,6 +18,9 @@ import DestinationDetail from './pages/DestinationDetail'
 import AllDestinations from './pages/AllDestinations'
 import Profile from './pages/Profile'
 import TicketLookup from './pages/TicketLookup'
+import FAQ from './pages/FAQ'
+import Terms from './pages/Terms'
+import Privacy from './pages/Privacy'
 
 function AppContent() {
   return (
@@ -31,6 +34,9 @@ function AppContent() {
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />
           <Route path="/destinations" element={<AllDestinations />} />
           <Route path="/ticket-lookup" element={<TicketLookup />} />
