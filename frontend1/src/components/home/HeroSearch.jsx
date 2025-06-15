@@ -462,19 +462,26 @@ export default function HeroSearch() {
                 Hành khách
               </label>
               <div className="relative group">
-                <select
-                  className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 text-lg font-medium hover:border-blue-400 group-hover:shadow-md cursor-pointer appearance-none"
-                  value={formData.passengers}
-                  onChange={e => setFormData({ ...formData, passengers: parseInt(e.target.value) })}
-                >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                    <option key={num} value={num}>{num} người lớn</option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                <div className="w-full px-4 py-4 border border-gray-300 rounded-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all duration-200 bg-white hover:border-blue-400 group-hover:shadow-md flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, passengers: Math.max(1, formData.passengers - 1) })}
+                    className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200 text-gray-600 hover:text-gray-800"
+                    disabled={formData.passengers <= 1}
+                  >
+                    <span className="text-lg font-bold">−</span>
+                  </button>
+                  <span className="text-lg font-medium text-gray-900">
+                    {formData.passengers} người lớn
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, passengers: Math.min(9, formData.passengers + 1) })}
+                    className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200 text-gray-600 hover:text-gray-800"
+                    disabled={formData.passengers >= 9}
+                  >
+                    <span className="text-lg font-bold">+</span>
+                  </button>
                 </div>
               </div>
             </div>
