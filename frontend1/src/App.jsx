@@ -21,6 +21,7 @@ import TicketLookup from './pages/TicketLookup'
 import FAQ from './pages/FAQ'
 import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
+import AdminDashboard from './pages/AdminDashboard'
 
 function AppContent() {
   return (
@@ -40,6 +41,9 @@ function AppContent() {
           <Route path="/destination/:id" element={<DestinationDetail />} />
           <Route path="/destinations" element={<AllDestinations />} />
           <Route path="/ticket-lookup" element={<TicketLookup />} />
+
+          {/* Admin routes */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           {/* Protected routes - User */}
           <Route path="/book" element={<ProtectedRoute><Book /></ProtectedRoute>} />

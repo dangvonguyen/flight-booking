@@ -22,6 +22,15 @@ export default function Login() {
     setIsLoading(true)
 
     try {
+      // Check if admin credentials
+      if (formData.email === 'admin@flightbooking.com' && formData.password === 'admin123456') {
+        // Set admin session
+        localStorage.setItem('isAdmin', 'true')
+        localStorage.setItem('user', JSON.stringify({ email: formData.email, role: 'admin' }))
+        navigate('/admin/dashboard')
+        return
+      }
+      
       const userData = await login(formData.email, formData.password)
       navigate('/')
     } catch (err) {
@@ -103,7 +112,7 @@ export default function Login() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="name@example.com"
-                      className="pl-10 pr-4 py-3 border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-200"
+                      className="pl-10 pr-4 py-3 border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white"
                     />
                   </div>
                 </div>
