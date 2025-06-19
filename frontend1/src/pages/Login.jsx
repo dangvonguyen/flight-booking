@@ -22,17 +22,18 @@ export default function Login() {
     setIsLoading(true)
 
     try {
-      // Check if admin credentials
-      if (formData.email === 'admin@flightbooking.com' && formData.password === 'admin123456') {
-        // Set admin session
-        localStorage.setItem('isAdmin', 'true')
-        localStorage.setItem('user', JSON.stringify({ email: formData.email, role: 'admin' }))
-        navigate('/admin/dashboard')
-        return
-      }
-      
       const userData = await login(formData.email, formData.password)
-      navigate('/')
+      
+      if (userData) {
+        // Kiểm tra nếu là admin thì chuyển đến trang admin
+        if (userData.role === 'admin') {
+          navigate('/admin/dashboard')
+        } else {
+          navigate('/')
+        }
+      } else {
+        setError('Email hoặc mật khẩu không đúng!')
+      }
     } catch (err) {
       setError('Email hoặc mật khẩu không đúng!')
     } finally {

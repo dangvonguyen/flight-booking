@@ -79,31 +79,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center">
-                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Bảng Điều Khiển Admin</h1>
-                <p className="text-gray-600">Quản lý hệ thống đặt vé máy bay</p>
-              </div>
-            </div>
-            <Button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              Đăng xuất
-            </Button>
-          </div>
-        </div>
-      </div>
-
       {/* Navigation Tabs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="bg-white/60 backdrop-blur-lg rounded-xl p-2 mb-8">
@@ -231,9 +206,9 @@ export default function AdminDashboard() {
                                user.status === 'pending' ? 'Chờ duyệt' : 'Không hoạt động'}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button className="text-indigo-600 hover:text-indigo-900 mr-3">Sửa</button>
-                            <button className="text-red-600 hover:text-red-900">Xóa</button>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
+                            <button className="text-indigo-600 hover:text-indigo-900 mr-3 bg-white">Sửa</button>
+                            <button className="text-red-600 hover:text-red-900 bg-white">Xóa</button>
                           </td>
                         </tr>
                       ))}
@@ -254,24 +229,82 @@ export default function AdminDashboard() {
                 
                 <div className="space-y-6">
                   {monthlyRevenueData.map((month) => (
-                    <div key={month.month} className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-4">Tháng {month.month}</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
-                          <p className="text-sm text-gray-600">Vietnam Airlines</p>
-                          <p className="text-lg font-semibold text-gray-900">{formatCurrency(month.vietnam_airlines)}</p>
+                    <div key={month.month} className="border border-gray-200 rounded-xl p-6 bg-white/60 backdrop-blur-sm">
+                      <h4 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        Tháng {month.month}
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                        <div className="group relative overflow-hidden bg-white p-6 rounded-xl border border-blue-200 hover:border-blue-300 transition-all duration-300 hover:scale-105">
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full -mr-10 -mt-10"></div>
+                          <div className="relative">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-blue-600">Vietnam Airlines</p>
+                                <p className="text-xs text-gray-500">Hãng hàng đầu</p>
+                              </div>
+                            </div>
+                            <p className="text-xl font-bold text-gray-900">{formatCurrency(month.vietnam_airlines)}</p>
+                          </div>
                         </div>
-                        <div className="bg-white p-4 rounded-lg border-l-4 border-green-500">
-                          <p className="text-sm text-gray-600">VietJet Air</p>
-                          <p className="text-lg font-semibold text-gray-900">{formatCurrency(month.vietjet)}</p>
+                        
+                        <div className="group relative overflow-hidden bg-white p-6 rounded-xl border border-green-200 hover:border-green-300 transition-all duration-300 hover:scale-105">
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full -mr-10 -mt-10"></div>
+                          <div className="relative">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-green-600">VietJet Air</p>
+                                <p className="text-xs text-gray-500">Giá cạnh tranh</p>
+                              </div>
+                            </div>
+                            <p className="text-xl font-bold text-gray-900">{formatCurrency(month.vietjet)}</p>
+                          </div>
                         </div>
-                        <div className="bg-white p-4 rounded-lg border-l-4 border-yellow-500">
-                          <p className="text-sm text-gray-600">Bamboo Airways</p>
-                          <p className="text-lg font-semibold text-gray-900">{formatCurrency(month.bamboo_airways)}</p>
+                        
+                        <div className="group relative overflow-hidden bg-white p-6 rounded-xl border border-yellow-200 hover:border-yellow-300 transition-all duration-300 hover:scale-105">
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-500/10 rounded-full -mr-10 -mt-10"></div>
+                          <div className="relative">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-yellow-600">Bamboo Airways</p>
+                                <p className="text-xs text-gray-500">Dịch vụ cao cấp</p>
+                              </div>
+                            </div>
+                            <p className="text-xl font-bold text-gray-900">{formatCurrency(month.bamboo_airways)}</p>
+                          </div>
                         </div>
-                        <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500">
-                          <p className="text-sm text-gray-600">Pacific Airlines</p>
-                          <p className="text-lg font-semibold text-gray-900">{formatCurrency(month.pacific_airlines)}</p>
+                        
+                        <div className="group relative overflow-hidden bg-white p-6 rounded-xl border border-purple-200 hover:border-purple-300 transition-all duration-300 hover:scale-105">
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full -mr-10 -mt-10"></div>
+                          <div className="relative">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-purple-600">Pacific Airlines</p>
+                                <p className="text-xs text-gray-500">Tuyến nội địa</p>
+                              </div>
+                            </div>
+                            <p className="text-xl font-bold text-gray-900">{formatCurrency(month.pacific_airlines)}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -289,45 +322,110 @@ export default function AdminDashboard() {
               <Card.Body className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-6">Tỷ lệ lắp đầy chuyến bay</h3>
                 
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                   {occupancyRates.map((airline, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h4 className="font-medium text-gray-900">{airline.airline}</h4>
-                          <p className="text-sm text-gray-600">{airline.flights} chuyến bay</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">{airline.rate}%</p>
-                        </div>
-                      </div>
+                    <div key={index} className="group relative overflow-hidden bg-white rounded-xl p-6 border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300">
+                      {/* Background decoration */}
+                      <div className={`absolute top-0 right-0 w-24 h-24 rounded-full -mr-12 -mt-12 opacity-10 ${
+                        airline.rate >= 80 ? 'bg-green-500' :
+                        airline.rate >= 70 ? 'bg-yellow-500' : 'bg-red-500'
+                      }`}></div>
                       
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div 
-                          className={`h-3 rounded-full ${
-                            airline.rate >= 80 ? 'bg-green-500' :
-                            airline.rate >= 70 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
-                          style={{ width: `${airline.rate}%` }}
-                        ></div>
-                      </div>
-                      
-                      <div className="mt-2 flex justify-between text-sm text-gray-600">
-                        <span>0%</span>
-                        <span>100%</span>
+                      <div className="relative">
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                              airline.rate >= 80 ? 'bg-green-100' :
+                              airline.rate >= 70 ? 'bg-yellow-100' : 'bg-red-100'
+                            }`}>
+                              <svg className={`w-6 h-6 ${
+                                airline.rate >= 80 ? 'text-green-600' :
+                                airline.rate >= 70 ? 'text-yellow-600' : 'text-red-600'
+                              }`} fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                              </svg>
+                            </div>
+                            <div>
+                              <h4 className="text-lg font-bold text-gray-900">{airline.airline}</h4>
+                              <p className="text-sm text-gray-500 flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                {airline.flights} chuyến bay
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className={`text-3xl font-bold ${
+                              airline.rate >= 80 ? 'text-green-600' :
+                              airline.rate >= 70 ? 'text-yellow-600' : 'text-red-600'
+                            }`}>{airline.rate}%</p>
+                            <p className="text-sm text-gray-500">Tỷ lệ lắp đầy</p>
+                          </div>
+                        </div>
+                        
+                        {/* Progress bar with better styling */}
+                        <div className="space-y-2">
+                          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                            <div 
+                              className={`h-4 rounded-full transition-all duration-1000 ease-out ${
+                                airline.rate >= 80 ? 'bg-gradient-to-r from-green-400 to-green-600' :
+                                airline.rate >= 70 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' : 
+                                'bg-gradient-to-r from-red-400 to-red-600'
+                              }`}
+                              style={{ width: `${airline.rate}%` }}
+                            ></div>
+                          </div>
+                          
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>0%</span>
+                            <span className={`font-medium ${
+                              airline.rate >= 80 ? 'text-green-600' :
+                              airline.rate >= 70 ? 'text-yellow-600' : 'text-red-600'
+                            }`}>
+                              {airline.rate >= 80 ? 'Xuất sắc' :
+                               airline.rate >= 70 ? 'Tốt' : 'Cần cải thiện'}
+                            </span>
+                            <span>100%</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
                 
-                <div className="mt-8 bg-blue-50 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-2">Phân tích tỷ lệ lắp đầy</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Vietnam Airlines dẫn đầu với tỷ lệ lắp đầy cao nhất (85.2%)</li>
-                    <li>• VietJet Air đạt tỷ lệ tốt với 78.6% và số chuyến bay nhiều nhất</li>
-                    <li>• Bamboo Airways và Pacific Airlines cần cải thiện tỷ lệ lắp đầy</li>
-                    <li>• Tỷ lệ lắp đầy trung bình toàn ngành: 76.5%</li>
-                  </ul>
+                {/* Analysis summary with modern design */}
+                <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl p-6 border border-blue-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <h4 className="text-lg font-bold text-blue-900">Phân tích tỷ lệ lắp đầy</h4>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <p className="text-sm text-blue-800">Vietnam Airlines dẫn đầu với tỷ lệ lắp đầy cao nhất (85.2%)</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <p className="text-sm text-blue-800">VietJet Air đạt tỷ lệ tốt với 78.6% và số chuyến bay nhiều nhất</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <p className="text-sm text-blue-800">Bamboo Airways và Pacific Airlines cần cải thiện tỷ lệ lắp đầy</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <p className="text-sm text-blue-800">Tỷ lệ lắp đầy trung bình toàn ngành: 76.5%</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </Card.Body>
             </Card>

@@ -22,15 +22,46 @@ export function AuthProvider({ children }) {
   // Kiểm tra trạng thái đăng nhập khi component mount
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
+    const isAdmin = localStorage.getItem('isAdmin')
+    
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser)
       setUser(parsedUser)
       setRole(parsedUser.role)
     }
+    
+    // Kiểm tra nếu là admin
+    if (isAdmin === 'true') {
+      const adminUser = {
+        email: 'admin@flightbooking.com',
+        firstName: 'Admin',
+        lastName: 'System',
+        role: 'admin'
+      }
+      setUser(adminUser)
+      setRole('admin')
+    }
+    
     setIsLoading(false)
   }, [])
 
   const login = (email, password) => {
+    // Kiểm tra admin credentials
+    if (email === 'admin@flightbooking.com' && password === 'admin123456') {
+      const adminUser = {
+        email: email,
+        firstName: 'Admin',
+        lastName: 'System',
+        role: 'admin'
+      }
+      
+      localStorage.setItem('isAdmin', 'true')
+      localStorage.setItem('user', JSON.stringify(adminUser))
+      setUser(adminUser)
+      setRole('admin')
+      return adminUser
+    }
+    
     // Tìm user trong danh sách test
     const foundUser = testUsers.find(
       u => u.email === email && u.password === password
@@ -69,8 +100,13 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('user')
+    localStorage.removeItem('isAdmin') // Xóa flag admin
     setUser(null)
     setRole(null)
+  }
+
+  const isAdmin = () => {
+    return role === 'admin'
   }
 
   if (isLoading) {
@@ -78,7 +114,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, role, login, register, logout }}>
+    <AuthContext.Provider value={{ user, role, login, register, logout, isAdmin }}>
       {children}
     </AuthContext.Provider>
   )

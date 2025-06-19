@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { FaPlane, FaUser, FaSignOutAlt, FaUserCircle, FaBars, FaTimes, FaChevronDown, FaTicketAlt, FaSearch, FaHistory } from 'react-icons/fa'
 import Button from '../ui/Button'
 
 export default function Navbar() {
-  const { user, role, logout } = useAuth()
+  const { user, role, logout, isAdmin } = useAuth()
+  const navigate = useNavigate()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showBookingMenu, setShowBookingMenu] = useState(false)
@@ -13,6 +14,7 @@ export default function Navbar() {
   const handleLogout = () => {
     logout()
     setShowUserMenu(false)
+    navigate('/')
   }
 
   return (
@@ -108,27 +110,44 @@ export default function Navbar() {
                       {user.firstName} {user.lastName}
                     </div>
                     <div className="text-xs text-gray-500">
-                      Khách hàng
+                      {isAdmin() ? 'Quản trị viên' : 'Khách hàng'}
                     </div>
                   </div>
                 </button>
 
                 {/* User Dropdown */}
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                    <Link
-                      to="/profile"
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <FaUser className="w-4 h-4" />
-                      Trang cá nhân
-                    </Link>
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    {isAdmin() ? (
+                      <>
+                        <Link
+                          to="/admin/dashboard"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                          Bảng điều khiển
+                        </Link>
+
+                      </>
+                    ) : (
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <FaUser className="w-4 h-4" />
+                        Trang cá nhân
+                      </Link>
+                    )}
+                    <div className="border-t border-gray-100 my-1"></div>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors duration-200 bg-white"
                     >
-                      <FaSignOutAlt className="w-4 h-4" />
+                      <FaSignOutAlt className="w-4 h-4 text-red-600" />
                       Đăng xuất
                     </button>
                   </div>
@@ -238,26 +257,39 @@ export default function Navbar() {
                         {user.firstName} {user.lastName}
                       </div>
                       <div className="text-sm text-gray-500">
-                        Khách hàng
+                        {isAdmin() ? 'Quản trị viên' : 'Khách hàng'}
                       </div>
                     </div>
                   </div>
-                  <Link
-                    to="/profile"
-                    className="flex items-center gap-3 px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
-                    onClick={() => setShowMobileMenu(false)}
-                  >
-                    <FaUser className="w-5 h-5" />
-                    Trang cá nhân
-                  </Link>
+                  {isAdmin() ? (
+                    <Link
+                      to="/admin/dashboard"
+                      className="flex items-center gap-3 px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                      onClick={() => setShowMobileMenu(false)}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                      Bảng điều khiển
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-3 px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                      onClick={() => setShowMobileMenu(false)}
+                    >
+                      <FaUser className="w-5 h-5" />
+                      Trang cá nhân
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       handleLogout()
                       setShowMobileMenu(false)
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
                   >
-                    <FaSignOutAlt className="w-5 h-5" />
+                    <FaSignOutAlt className="w-5 h-5 text-red-600" />
                     Đăng xuất
                   </button>
                 </div>
